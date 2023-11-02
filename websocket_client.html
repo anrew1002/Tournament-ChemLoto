@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Number Viewer</title>
+</head>
+<body>
+    <div id="numberValue">Waiting for the number...</div>
+
+    <script>
+        const numberValue = document.getElementById('numberValue');
+
+        const socket = new WebSocket('ws://localhost:8080');  // Убедитесь, что это URL вашего WebSocket-сервера
+
+        socket.onopen = function (event) {
+            console.log('WebSocket connection opened');
+        };
+
+        socket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            const randomNumber = data.randomNumber;
+            numberValue.innerText = `Random Number: ${randomNumber}`;
+        };
+
+        socket.onclose = function (event) {
+            if (event.wasClean) {
+                console.log('WebSocket connection closed cleanly, code=' + event.code + ', reason=' + event.reason);
+            } else {
+                console.error('WebSocket connection abruptly closed');
+            }
+        };
+
+        socket.onerror = function (error) {
+            console.error('WebSocket error:', error);
+        };
+    </script>
+</body>
+</html>
