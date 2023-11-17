@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -13,9 +14,10 @@ func (app *App) AuthMiddleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Use dependencyA and dependencyB here.
-			if userSession, err := isAuthenticated(r, app); err != nil {
+			if userSession, err := Authenticate(r, app); err != nil {
 				http.Redirect(w, r, "/", http.StatusFound)
 			} else {
+				log.Println("req: ", userSession.Values)
 				//TODO: add more context to user
 				ctx := context.WithValue(r.Context(), "user", userSession)
 				next.ServeHTTP(w, r.WithContext(ctx))
@@ -24,8 +26,8 @@ func (app *App) AuthMiddleware() func(http.Handler) http.Handler {
 	}
 }
 
-// isAuthenticated helps encapsulate logic
-func isAuthenticated(r *http.Request, app *App) (*sessions.Session, error) {
+// Authenticate helps encapsulate logic
+func Authenticate(r *http.Request, app *App) (*sessions.Session, error) {
 	c, err := r.Cookie("session_token")
 	if err != nil {
 		return nil, err

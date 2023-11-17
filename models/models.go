@@ -6,3 +6,8 @@ type User struct {
 	Password string
 	Admin    bool
 }
+type Room struct {
+	Name       string
+	Time       int
+	Max_partic int
+}
