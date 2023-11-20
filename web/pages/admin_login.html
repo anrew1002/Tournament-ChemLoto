@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin</title>
+    </head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        #header {
+            text-align: right;
+            padding: 10px;
+        }
+
+        #content {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #content h2 {
+            text-align: center;
+        }
+
+        #content label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #content input[type="text"],
+        #content input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            /* Увеличил отступ между инпутами */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #content input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        #content button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            /* Увеличил отступ между кнопками */
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #toggleForm {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #toggleForm:hover {
+            background-color: #218838;
+        }
+
+        #error {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+    <body>
+        <div id="content">
+            <h2>Организатор:</h2>
+            <form method="post" action="">
+                <label for="name">Введите имя:</label>
+                <input type="text" name="name" id="name" required>
+
+                <!-- <label for="password">Пароль:</label>
+                <input type="password" name="password" id="password" required> -->
+
+                <input type="checkbox" name="organizer" id="organizer">
+                <label for="organizer">Вы организатор?</label>
+
+                <div class="hidden" id="codeContainer">
+                    <label for="code">Введите код:</label>
+                    <input type="text" name="code" id="code">
+                </div>
+
+                <button type="submit" name="register">Зарегистрировать</button>
+            </form>
+
+            <div id="error">
+
+                <label class='error'>{{.name}}</label>
+                <label class='error'>{{.code}}</label>
+
+            </div>
+        </div>
+
+        <script>
+            // JavaScript для показа/скрытия поля ввода кода при выборе чекбокса
+            const organizerCheckbox = document.getElementById('organizer');
+            const codeContainer = document.getElementById('codeContainer');
+    
+            organizerCheckbox.addEventListener('change', function () {
+                codeContainer.style.display = organizerCheckbox.checked ? 'block' : 'none';
+            });
+         </script>
+
+    </body>
+</html>

@@ -9,6 +9,24 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+func (app *App) AdminMiddleware() func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			userSession := r.Context().Value("user").(*sessions.Session)
+			admin, ok := userSession.Values["admin"].(bool)
+			if !ok {
+				log.Println("AdminMiddleware: Fail to type assertion")
+			}
+
+			if admin {
+				next.ServeHTTP(w, r)
+			} else {
+				http.Redirect(w, r, "/admin_login", http.StatusFound)
+			}
+		})
+	}
+}
+
 // AuthMiddleware is a middleware function for authentication.
 func (app *App) AuthMiddleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {

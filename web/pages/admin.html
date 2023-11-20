@@ -68,30 +68,17 @@
 <body>
     <h1>Админ-панель</h1>
     <div class="container">
-        <?php
-        if (isset($_SESSION['isOrganizer']) && $_SESSION['isOrganizer']) {
-            // Организатор вошел в систему, показываем кнопку для очистки комнат и пользователей
-            echo '<p>Здравствуйте, ' . $_SESSION['username'] . '!</p>';
-            echo '<div class="button-container">';
-            echo '<form method="post" action="admin_panel.php">';
-            echo '<button type="submit" name="clearRooms" class="button red">Очистить список комнат</button>';
-            echo '</form>';
-            echo '<form method="post" action="admin_panel.php">';
-            echo '<button type="submit" name="clearUsers" class="button red">Очистить базу данных пользователей</button>';
-            echo '</form>';
-            echo '</div>';
-            echo '<br>';
-            echo '<a href="room_list.php" class="button">Вернуться к комнатам</a>';
-        } else {
-            // Организатор не вошел в систему, показываем форму для ввода кода
-            echo '
-            <form method="post" action="login_organizer.php">
-                <label for="code">Введите код:</label>
-                <input type="text" name="code" id="code">
-                <button type="submit" class="button">Войти как организатор</button>
-            </form>';
-        }
-        ?>
+            <p>Здравствуйте, {{.Username}}!</p>
+            <div class="button-container">
+            <form method="post" action="admin_panel.php">
+            <button type="submit" name="clearRooms" class="button red">Очистить список комнат</button>
+            </form>
+            <form method="post" action="admin_panel.php">
+            <button type="submit" name="clearUsers" class="button red">Очистить базу данных пользователей</button>
+            </form>
+            </div>
+            <br>
+            <a href="/hub" class="button">Вернуться к комнатам</a>
     </div>
 </body>
 </html>

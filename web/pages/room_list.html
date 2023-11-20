@@ -74,17 +74,20 @@
 
         <div id="header">
             {{.Username}}
+            {{if .Admin}}
             <form method="post" action="logout.php" style="display: inline;">
                 <button type="submit" name="logout"
                     style="background-color: red; color: white;">Выход</button>
             </form>
-            <form method="post" action="admin_panel.php"
+            <form method="GET" action="/admin"
                 style="display: inline;">
                 <button type="submit" name="admin_panel">Админ-панель</button>
             </form>
+            {{end}}
         </div>
+        {{if .Admin}}
         <button onclick="showCreateRoomForm()">Создать комнату</button>
-
+        {{end}}
         <!-- Модальное окно для создания комнаты -->
         <div id="createRoomModal" class="modal">
             <div class="modal-content">
@@ -98,7 +101,7 @@
                     <input type="checkbox" name="autoPlay" id="autoPlay">
 
                     <!-- Этот блок будет появляться при выборе "Авто-игра" -->
-                    <div id="timeControl"  style="display: none;">
+                    <div id="timeControl" style="display: none;">
                         <label>Время на ход (в секундах):</label>
                         <select id="timeOptions" name="timeOptions">
                             <option value="20">20 секунд</option>
@@ -111,6 +114,11 @@
                     <input type="number" id="maxPlayers" min="2">
 
                     <button type="button" onclick="createRoom()">Создать</button>
+                    <div id="error">
+
+                        <!-- <label class='error'></label> -->
+
+                    </div>
                 </form>
             </div>
         </div>
@@ -137,7 +145,7 @@ function createRoom() {
         const maxPlayers = document.getElementById('maxPlayers').value;
 
         // Отправить данные на сервер для создания комнаты
-        fetch('/room/create', {
+        fetch('/api/room', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -152,12 +160,23 @@ function createRoom() {
         })
             .then(response => response.json())
             .then(data => {
+                console.log(data)
                 if (data.success) {
-                    // Успешно создано, добавьте комнату к таблице без перезагрузки
-                    addRoomToTable(data.roomId, roomName, isAuto, time, maxPlayers, data.organizer);
+                    // // Успешно создано, добавьте комнату к таблице без перезагрузки
+                    // addRoomToTable(data.roomId, roomName, isAuto, time, maxPlayers, data.organizer);
+                    const err = document.getElementById('error');
+                    err.innerHTML = ""
                     hideCreateRoomForm(); // Скрыть модальное окно
+                    // location.reload();
                 } else {
-                    console.error('Ошибка при создании комнаты: ' + data.error);
+                    const err = document.getElementById('error');
+                    err.innerHTML = ""
+                    console.log("error",data.errors)
+                    for (let KeyErr in data.errors){
+                        err.innerHTML += data.errors[KeyErr] + '<br>'  
+                        console.log(KeyErr)
+                    }
+
                 }
             })
             .catch(error => console.error('Ошибка при создании комнаты: ' + error));
@@ -172,7 +191,7 @@ function createRoom() {
 
 // Функция для обновления данных о комнатах на странице
 function updateRoomList() {
-    fetch('update_room_list.php') // Отправить запрос на получение данных
+    fetch('/api/room') // Отправить запрос на получение данных
         .then(response => response.json())
         .then(data => {
             var roomTable = document.getElementById('roomTable');
@@ -182,7 +201,7 @@ function updateRoomList() {
                 roomTable.deleteRow(1);
             }
 
-            data.forEach(room => {
+            data.rooms.forEach(room => {
                 var row = roomTable.insertRow(-1);
                 var cell1 = row.insertCell(0);
                 var cell2 = row.insertCell(1);
@@ -192,10 +211,10 @@ function updateRoomList() {
 
 
 
-                cell1.innerHTML = room.id;
-                cell2.innerHTML = '<a href="rooms/' + room.id + '.php">' + room.name + '</a>';
+                cell1.innerHTML = room.Name;
+                cell2.innerHTML = '<a href="room/' + room.name + '</a>';
                 cell3.innerHTML = room.is_auto ? 'Да' : 'Нет';
-                cell4.innerHTML = room.time;
+                cell4.innerHTML = room.Time;
                 cell5.innerHTML = room.max_players;
 
 

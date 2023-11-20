@@ -1,10 +1,12 @@
 package models
 
 type User struct {
-	Id       string
+	// Id       string
 	Username string
-	Password string
-	Admin    bool
+	Score    int
+	Room     string
+	// Password string
+	Admin bool
 }
 type Room struct {
 	Name       string

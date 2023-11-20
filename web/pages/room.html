@@ -1,25 +1,566 @@
-<div>
-    <h1>Добро пожаловать в комнату {{.Room}}</h1>
-    <p>Максимальное количество игроков: 2</p>
-    <div id="numberValue">0</div>
-    <!-- Дополнительное содержимое вашей комнаты -->
-</div>
-<script>
-const eventSource = new EventSource('../live_update.php');
+<!DOCTYPE html>
+<html lang="en">
 
-eventSource.onmessage = function (event) {
-    const data = JSON.parse(event.data);
-    const randomNumber = data.randomNumber;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Добавлены стили для мерцания */
+        @keyframes flashAnimation {
 
-    // Обновить значение числа на странице
-    const numberValue = document.getElementById('numberValue');
-    numberValue.innerText = randomNumber;
+            0%,
+            100% {
+                opacity: 1;
+            }
 
-    function setWebsocket () {
-        let socket = new WebSocket('ws://127.0.0.1:80/ws')
-        socket.onmessage = function (event) {
-        messageHandler(JSON.parse(event.data))
+            50% {
+                opacity: 0.5;
+            }
         }
-    };
-}
-</script>
+
+        /* Добавлены стили для блока таймера */
+        .timer {
+            font-family: monospace;
+            font-size: 36px;
+            color: #333;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            background-color: #f0f8ff;
+            /* Голубой фон */
+        }
+
+        .flash {
+            animation: flashAnimation 0.5s infinite alternate;
+        }
+
+        header {
+            background-color: #61b0ff;
+            /* Темно-синий фон */
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .room-title {
+            text-align: center;
+            margin: 0;
+            /* Убираем отступы */
+            flex-grow: 1;
+            /* Занимает доступное пространство */
+            padding-left: 60px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
+        }
+
+        .table-info {
+            font-size: 18px;
+            font-weight: bold;
+            padding-right: 20px;
+            min-width: 120px;
+            /* Устанавливаем минимальную ширину */
+        }
+
+        .logout-btn {
+            background-color: #1c1c1c;
+            /* Красная кнопка выхода */
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            min-width: 120px;
+            /* Устанавливаем минимальную ширину */
+        }
+
+        .logout-btn:hover {
+            background-color: #cc0000;
+            /* Темно-красный при наведении */
+        }
+
+        main {
+            display: flex;
+            justify-content: space-between;
+
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        .top-players,
+        .chat {
+            width: 15%;
+            border: 1px solid #87CEFA;
+            /* Светло-голубая граница */
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            max-height: 700px;
+
+            margin: 10px;
+            text-align: center;
+            background-color: rgb(105, 162, 212);
+            /* Голубой фон */
+            color: #fff;
+            /* Белый текст */
+        }
+
+        .top-players {
+            text-align: left;
+        }
+
+        .top-players h2 {
+            margin-bottom: 10px;
+        }
+
+        .top-players ul {
+            list-style: none;
+            padding: 0;
+            font-weight: bold;
+        }
+
+        .top-players li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+        }
+
+        .top-players li:last-child {
+            border-bottom: none;
+            /* Убрано разделительное поле у последнего элемента списка */
+        }
+
+        .top-players li span {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .top-players li:nth-child(1) {
+            background-color: #FFD700;
+            /* Золото для первого места */
+            color: #000;
+            /* Черный цвет текста для первого места */
+            font-weight: bold;
+        }
+
+        .top-players li:nth-child(2) {
+            background-color: #C0C0C0;
+            /* Серебро для второго места */
+            color: #000;
+            /* Черный цвет текста для второго места */
+            font-weight: bold;
+        }
+
+        .top-players li:nth-child(3) {
+            background-color: #cd7f32;
+            /* Бронза для третьего места */
+            color: #000000;
+            /* Белый цвет текста для третьего места */
+            font-weight: bold;
+        }
+
+        .top-players li span.score {
+            color: rgb(0, 0, 0);
+            /* Зеленый цвет для количества очков */
+        }
+
+        .main-content {
+            text-align: center;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            position: relative;
+            flex: 3;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .timer {
+            font-family: monospace;
+            font-size: 36px;
+            color: #333;
+        }
+
+        .main-content img {
+            width: 100%;
+            max-width: 690px;
+            height: auto;
+            border-radius: 50%;
+            opacity: 1;
+        }
+
+        /* Обновлены стили для чата и поля ввода сообщений */
+        .chat {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Выравнивание содержимого по центру */
+        }
+
+        .chat h2 {
+            margin-bottom: 10px;
+            /* Отступ между заголовком и содержимым чата */
+        }
+
+        .chat-input {
+            margin-top: auto;
+            /* Автоматический отступ сверху, чтобы прижать вниз */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            /* Чтобы поле ввода занимало всю доступную ширину */
+        }
+
+        .chat-input input {
+            padding: 10px;
+            width: 90%;
+            flex-grow: 1;
+            margin-bottom: 5px;
+        }
+
+        .table-info>span {
+            font-size: 24px;
+
+        }
+
+        /* Остальные стили остаются без изменений */
+
+
+        .last-elements {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .element-img {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+        }
+
+        .raise-hand-btn {
+            background-color: #4682B4;
+            /* Синий цвет */
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .raise-hand-btn:hover {
+            background-color: #1E90FF;
+            /* Голубой цвет при наведении */
+        }
+
+        /* Добавлены ключевые кадры для анимации */
+        @keyframes fadeInOut {
+
+            0%,
+            100% {
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Добавьте следующие стили для блока .icons */
+        .icons {
+            position: fixed;
+            top: 6%;
+            right: 2%;
+            display: none;
+            /* Скрыть иконки по умолчанию */
+            z-index: 999;
+            /* Установить z-index, чтобы иконки были поверх других элементов */
+        }
+
+        .icons button {
+            margin: 5px;
+        }
+
+        /* Добавьте медиа-запрос для показа иконок при ширине экрана 850px и больше */
+        @media only screen and (max-width: 851px) {
+            header {
+
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .user-info {
+                padding-left: 10px;
+            }
+
+            .table-info {
+                font-size: 15px;
+            }
+
+            .table-info>span {
+                font-size: 15px;
+
+            }
+
+            .logout-btn {
+                min-width: auto;
+                /* Сброс минимальной ширины для кнопки выхода */
+                padding: 5px 10px;
+                /* Уменьшите отступы кнопки */
+            }
+
+            .room-title {
+                padding-left: 130px;
+                font-size: 20px;
+
+            }
+
+            .icons {
+                display: block;
+            }
+
+            .top-players,
+            .chat {
+                display: none;
+                /* Скрыть эти панели по умолчанию на экранах размером 850px и меньше */
+            }
+
+            /* Добавьте стили для анимации плавного появления иконок */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            .icons {
+                animation: fadeIn 1s ease-out;
+                /* Добавьте анимацию к блоку .icons */
+            }
+
+            .main-content img {
+                max-width: 80%;
+                /* Уменьшите максимальную ширину картинки */
+            }
+
+            .last-elements {
+                bottom: 10px;
+                right: 10px;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .element-img {
+                width: 30px;
+                /* Уменьшите размер изображений элементов */
+                height: 30px;
+                margin: 5px;
+            }
+
+            @media only screen and (max-width: 600px) {
+                header {
+                    height: 50px;
+                }
+
+                .room-title {
+                    flex-grow: 0;
+                    padding-right: 20px;
+                }
+
+                main {
+                    position: relative;
+                    /* Устанавливаем позицию main как относительную для абсолютного позиционирования .table-info */
+                }
+
+                .table-info {
+                    position: absolute;
+                    top: 5%;
+                    left: 10px;
+                    /* Установите нужное значение отступа от левого края */
+                    color: #000;
+                    font-size: 12px;
+
+                }
+
+            }
+
+            @media only screen and (max-width: 407px) {
+                .room-title {
+                    font-size: 15px;
+                    padding-left: 0;
+                }
+
+                .top-players {
+                    min-width: 140px;
+                    font-size: 11px;
+                    padding: 5px;
+                    margin-top: 30px;
+                }
+
+                .chat {
+                    min-width: 140px;
+                    font-size: 11px;
+                    padding: 5px;
+                    margin-top: 30px;
+                }
+
+                .last-elements {
+                    bottom: 10px;
+                    right: 10px;
+
+                }
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="user-info">
+            <button class="logout-btn">Выйти</button>
+        </div>
+        <h1 class="room-title">{{.Room}}</h1>
+        <p class="table-info">Ваш номер стола: <span>42</span></p>
+    </header>
+
+    <main>
+        <div class="top-players">
+            <h2>Топ игроков</h2>
+            <ul>
+                <li>1. Игрок 1 <span class="score">100 очков</span></li>
+                <li>2. Игрок 2 <span class="score">90 очков</span></li>
+                <li>3. Игрок 3 <span class="score">80 очков</span></li>
+                <li>4. Игрок 4 <span class="score">2 очка</span></li>
+            </ul>
+        </div>
+
+        <div class="icons">
+            <button id="chatToggle">Чат</button>
+            <button id="topToggle">ТОП</button>
+        </div>
+
+        <div class="main-content">
+            <div class="timer">00:20</div>
+            <img id="elementImage" src="/items/chem_el.png" alt="Химический элемент">
+            <button class="raise-hand-btn" onclick="raiseHand()">Поднять руку</button>
+        </div>
+
+        <div class="chat">
+            <h2>Чат</h2>
+            <div>
+                <!-- Здесь будет содержимое чата -->
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="Введите сообщение">
+                <button style="background-color: #4682B4; color: #fff;">Отправить</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="last-elements">
+        <h3>Последние элементы</h3>
+        <img class="element-img" src="/items/chem_el2.png" alt="Элемент 1">
+        <img class="element-img" src="/items/chem_el2.png" alt="Элемент 2">
+        <img class="element-img" src="/items/chem_el2.png" alt="Элемент 3">
+        <img class="element-img" src="/items/chem_el2.png" alt="Элемент 4">
+        <img class="element-img" src="/items/chem_el.png" alt="Элемент 5">
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var timerElement = document.querySelector(".timer");
+            var imageElement = document.getElementById("elementImage");
+            var initialTime = 20;
+
+            function updateTimer() {
+                timerElement.textContent = formatTime(initialTime);
+
+                // Добавлено условие для мерцания
+                if (initialTime <= 5 && initialTime % 2 === 0) {
+                    imageElement.classList.add("flash");
+                } else {
+                    imageElement.classList.remove("flash");
+                }
+
+                // Добавлено условие для анимации смены картинки
+                if (initialTime <= 0) {
+                    imageElement.src = "chem_el2.png";
+                    resetTimer();
+                }
+
+                initialTime--;
+                setTimeout(updateTimer, 1000);
+            }
+
+            function formatTime(seconds) {
+                var minutes = Math.floor(seconds / 60);
+                var remainingSeconds = seconds % 60;
+
+                var formattedTime =
+                    pad(minutes, 2) + ":" + pad(remainingSeconds, 2);
+
+                return formattedTime;
+            }
+
+            function pad(number, length) {
+                var str = String(number);
+                while (str.length < length) {
+                    str = "0" + str;
+                }
+                return str;
+            }
+
+            function resetTimer() {
+                initialTime = 20;
+            }
+
+            updateTimer();
+        });
+        document.getElementById('chatToggle').onclick = function () {
+            var chatElement = document.querySelector('.chat');
+
+            if (chatElement.style.display === 'none') chatElement.style.display = 'flex';
+            else chatElement.style.display = 'none';
+        };
+        document.getElementById('topToggle').onclick = function () {
+            var topElement = document.querySelector('.top-players');
+
+            if (topElement.style.display === 'none') topElement.style.display = 'block';
+            else topElement.style.display = 'none';
+        };
+    </script>
+</body>
+
+</html>

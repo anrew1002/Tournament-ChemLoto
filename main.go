@@ -44,18 +44,28 @@ func main() {
 	r.Use(middleware.RequestID)
 	r.Group(func(r chi.Router) {
 		r.Use(app.AuthMiddleware())
-		r.Get("/secure", app.LoginHandler())
-		r.Get("/room_list", app.RoomListHandler())
+		// r.Get("/secure", app.LoginHandler())
+		r.Get("/hub", app.HubHandler())
+		r.Get("/api/room", app.GetRooms())
+		r.Get("/api/user", app.GetUsers())
+		r.Delete("/api/room", app.RoomDeleteHandler())
 		r.Get("/room/{room_id}", app.RoomHandler())
 
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(app.AuthMiddleware())
-		r.Post("/room/create", app.CreateRoomHandler())
-
+		r.Use(app.AdminMiddleware())
+		r.Get("/admin", app.AdminPanelHandler())
+		r.Post("/api/room", app.CreateRoomHandler())
 	})
+
+	items := http.FileServer(http.Dir("./web/items"))
+	r.Handle("/items/*", http.StripPrefix("/items/", items))
+
 	r.Get("/", app.LoginHandler())
-	r.Post("/", app.PostLoginHandler(*AdminCode))
+	r.Post("/", app.PostLoginHandler())
+	r.Get("/admin_login", app.AdminLoginHandler())
+	r.Post("/admin_login", app.PostAdminLoginHandler(*AdminCode))
 	srv := &http.Server{
 		Addr:    *addr,
 		Handler: r,
