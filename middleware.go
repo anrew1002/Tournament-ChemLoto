@@ -35,7 +35,7 @@ func (app *App) AuthMiddleware() func(http.Handler) http.Handler {
 			if userSession, err := Authenticate(r, app); err != nil {
 				http.Redirect(w, r, "/", http.StatusFound)
 			} else {
-				log.Println("req: ", userSession.Values)
+				// log.Println("req: ", userSession.Values)
 				//TODO: add more context to user
 				ctx := context.WithValue(r.Context(), "user", userSession)
 				next.ServeHTTP(w, r.WithContext(ctx))

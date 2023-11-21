@@ -47,7 +47,7 @@ func (app *App) HubHandler() http.HandlerFunc {
 func (app *App) GetRooms() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rooms := sqlite.NewStorage().GetRooms()
-		app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"rooms": rooms}, nil)
+		app.writeJSON(w, http.StatusOK, envelope{"rooms": rooms}, nil)
 	}
 }
 func (app *App) CreateRoomHandler() http.HandlerFunc {

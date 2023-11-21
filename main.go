@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/anrew1002/Tournament-ChemLoto/sqlite"
-	"github.com/gorilla/sessions"
+	"github.com/anrew1002/Tournament-ChemLoto/sqlitestore"
 	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/go-chi/chi/middleware"
@@ -17,7 +17,7 @@ import (
 
 type App struct {
 	database sqlite.Storage
-	CS       *sessions.CookieStore
+	CS       *sqlitestore.SqliteStore
 }
 
 func checkFileExists(filePath string) bool {
@@ -37,9 +37,13 @@ func main() {
 	// log.Print(key)
 	app := &App{
 		database: sqlite.NewStorage(),
-		CS:       sessions.NewCookieStore([]byte("82 47 76 29 241 16 238 7 14 186 175 11 19 12 26 152 213 18 216 253 135 57 56 126 139 198 242 151 175 11 25 90")),
+		// CS:       sessions.NewCookieStore([]byte("82 47 76 29 241 16 238 7 14 186 175 11 19 12 26 152 213 18 216 253 135 57 56 126 139 198 242 151 175 11 25 90")),
 	}
-
+	cs, err := sqlitestore.NewSqliteStoreFromConnection(app.database, "sessions", "/", 2592000, []byte("82 47 76 29 241 16 238 7 14 186 175 11 19 12 26 152 213 18 216 253 135 57 56 126 139 198 242 151 175 11 25 90"))
+	if err != nil {
+		panic("failed connect to sqlitestore")
+	}
+	app.CS = cs
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Group(func(r chi.Router) {
