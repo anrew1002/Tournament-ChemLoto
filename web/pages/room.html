@@ -458,12 +458,7 @@
     <main>
         <div class="top-players">
             <h2>Топ игроков</h2>
-            <ul>
-                <li>1. Игрок 1 <span class="score">100 очков</span></li>
-                <li>2. Игрок 2 <span class="score">90 очков</span></li>
-                <li>3. Игрок 3 <span class="score">80 очков</span></li>
-                <li>4. Игрок 4 <span class="score">2 очка</span></li>
-            </ul>
+            <ul id="topPlayersList"></ul>
         </div>
 
         <div class="icons">
@@ -547,6 +542,36 @@
             }
 
             updateTimer();
+            function fetchAndUpdateTopPlayers() {
+    fetch("/api/user")
+        .then(response => response.json())
+        .then(data => {
+            const topPlayersList = document.getElementById("topPlayersList");
+
+            // Clear existing list
+            topPlayersList.innerHTML = "";
+
+            // Фильтруем пользователей по комнате (замените "Название Комнаты" на фактическое название комнаты)
+            const usersInRoom = data.users.filter(user => user.Room === "");
+
+            // Loop through the filtered user data and update the table
+            usersInRoom.forEach(user => {
+                const listItem = document.createElement("li");
+                listItem.textContent = `${user.Username} - ${user.Score} очков`;
+                topPlayersList.appendChild(listItem);
+            });
+        })
+        .catch(error => console.error("Error fetching user data:", error));
+}
+
+
+        // ... (existing code)
+
+        // Fetch and update top players initially
+        fetchAndUpdateTopPlayers();
+
+        // Set up an interval to periodically update the top players table
+        setInterval(fetchAndUpdateTopPlayers, 1000); // Update every minute (adjust as needed)
         });
         document.getElementById('chatToggle').onclick = function () {
             var chatElement = document.querySelector('.chat');
@@ -560,6 +585,7 @@
             if (topElement.style.display === 'none') topElement.style.display = 'block';
             else topElement.style.display = 'none';
         };
+        
     </script>
 </body>
 
