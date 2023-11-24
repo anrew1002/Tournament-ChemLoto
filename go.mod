@@ -9,12 +9,10 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.18
 )
 
-require (
-	github.com/ajg/form v1.5.1 // indirect
-	github.com/go-chi/render v1.0.3 // indirect
-)
+require golang.org/x/net v0.17.0 // indirect
 
 require (
 	github.com/go-chi/chi v1.5.5
-	github.com/gorilla/securecookie v1.1.2 // indirect
+	github.com/gorilla/securecookie v1.1.2
+	github.com/gorilla/websocket v1.5.1
 )

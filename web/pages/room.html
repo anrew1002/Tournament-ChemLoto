@@ -443,6 +443,7 @@
             }
         }
     </style>
+    <script src="/static/websocket.js"></script>
 </head>
 
 <body>
@@ -474,13 +475,18 @@
 
         <div class="chat">
             <h2>Чат</h2>
-            <div>
+            <div class="messages">
+                <div id="start_message" class="message" style="display: block ;">
+                    <span class="message__author"> Андрей 🤏 </span> <br>
+                    <span class="message__field"> Привет! </span>
+                </div>
                 <!-- Здесь будет содержимое чата -->
             </div>
-            <div class="chat-input">
-                <input type="text" placeholder="Введите сообщение">
-                <button style="background-color: #4682B4; color: #fff;">Отправить</button>
-            </div>
+            <form name="publish">
+                <input type="text" name="message" placeholder="Введите сообщение">
+                <!-- <button>Отправить</button> -->
+                <input style="background-color: #4682B4; color: #fff;" class='btn' type="submit" value="Отправить">
+            </form>
         </div>
     </main>
 
@@ -543,35 +549,35 @@
 
             updateTimer();
             function fetchAndUpdateTopPlayers() {
-    fetch("/api/user")
-        .then(response => response.json())
-        .then(data => {
-            const topPlayersList = document.getElementById("topPlayersList");
+                fetch("/api/user")
+                    .then(response => response.json())
+                    .then(data => {
+                        const topPlayersList = document.getElementById("topPlayersList");
 
-            // Clear existing list
-            topPlayersList.innerHTML = "";
+                        // Clear existing list
+                        topPlayersList.innerHTML = "";
 
-            // Фильтруем пользователей по комнате (замените "Название Комнаты" на фактическое название комнаты)
-            const usersInRoom = data.users.filter(user => user.Room === "");
+                        // Фильтруем пользователей по комнате (замените "Название Комнаты" на фактическое название комнаты)
+                        const usersInRoom = data.users.filter(user => user.Room === "");
 
-            // Loop through the filtered user data and update the table
-            usersInRoom.forEach(user => {
-                const listItem = document.createElement("li");
-                listItem.textContent = `${user.Username} - ${user.Score} очков`;
-                topPlayersList.appendChild(listItem);
-            });
-        })
-        .catch(error => console.error("Error fetching user data:", error));
-}
+                        // Loop through the filtered user data and update the table
+                        usersInRoom.forEach(user => {
+                            const listItem = document.createElement("li");
+                            listItem.textContent = `${user.Username} - ${user.Score} очков`;
+                            topPlayersList.appendChild(listItem);
+                        });
+                    })
+                    .catch(error => console.error("Error fetching user data:", error));
+            }
 
 
-        // ... (existing code)
+            // ... (existing code)
 
-        // Fetch and update top players initially
-        fetchAndUpdateTopPlayers();
+            // Fetch and update top players initially
+            fetchAndUpdateTopPlayers();
 
-        // Set up an interval to periodically update the top players table
-        setInterval(fetchAndUpdateTopPlayers, 1000); // Update every minute (adjust as needed)
+            // Set up an interval to periodically update the top players table
+            setInterval(fetchAndUpdateTopPlayers, 1000); // Update every minute (adjust as needed)
         });
         document.getElementById('chatToggle').onclick = function () {
             var chatElement = document.querySelector('.chat');
@@ -585,7 +591,7 @@
             if (topElement.style.display === 'none') topElement.style.display = 'block';
             else topElement.style.display = 'none';
         };
-        
+
     </script>
 </body>
 
