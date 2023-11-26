@@ -127,21 +127,32 @@ func (app *App) RoomDeleteHandler() http.HandlerFunc {
 }
 func (app *App) UserHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.RequestURI)
 		if roomID := chi.URLParam(r, "user_id"); roomID != "" {
 			if err := r.ParseForm(); err != nil {
 				fmt.Fprintf(w, "ParseForm() err: %v", err)
 				return
 			}
+			log.Println("update score on: ", r.FormValue("score"), roomID)
 			// formErrors := make(map[string]string)
 			if r.FormValue("score") != "" {
-				userSession := r.Context().Value("user").(*sessions.Session)
-				username, ok := userSession.Values["username"].(string)
-				if !ok {
-					log.Println("Fail to type assertion")
+
+				// userSession := r.Context().Value("user").(*sessions.Session)
+				// username, ok := userSession.Values["username"].(string)
+				// if !ok {
+				// 	log.Println("Fail to type assertion")
+				// }
+				err := app.database.UpdateUserScore(roomID)
+				if err != nil {
+					app.writeJSON(w, http.StatusBadRequest, envelope{"success": false}, nil)
 				}
-				app.database.UpdateUserScore(username)
 				app.writeJSON(w, http.StatusOK, envelope{"success": true}, nil)
+				return
 			}
+			app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"success": false}, nil)
+			return
+		} else {
+			app.writeJSON(w, http.StatusBadRequest, nil, nil)
 		}
 	}
 }

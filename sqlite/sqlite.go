@@ -108,15 +108,12 @@ func (s Storage) AddUser(user *models.User) {
 	// }
 	// user.Id = strconv.FormatInt(id, 10)
 }
-func (s Storage) UpdateUserScore(user string) {
+func (s Storage) UpdateUserScore(user string) error {
 	_, err := s.Exec(`UPDATE users
 								SET score = score + $1
 								WHERE
 									username = $2
-								ORDER column_or_expression
-								LIMIT row_count`,
+								`,
 		1, user)
-	if err != nil {
-		log.Println(err)
-	}
+	return err
 }

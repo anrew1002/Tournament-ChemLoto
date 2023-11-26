@@ -50,10 +50,10 @@ func main() {
 		r.Use(app.AuthMiddleware())
 		// r.Get("/secure", app.LoginHandler())
 		r.Get("/hub", app.HubHandler())
-		r.Get("/api/room", app.GetRooms())
-		r.Get("/api/user", app.GetUsers())
-		r.Delete("/api/room{room_id}", app.RoomDeleteHandler())
-		r.Get("/room/{room_id}", app.RoomHandler())
+		r.Get("/api/rooms", app.GetRooms())
+		r.Get("/api/users", app.GetUsers())
+		r.Delete("/api/rooms/{room_id}", app.RoomDeleteHandler())
+		r.Get("/rooms/{room_id}", app.RoomHandler())
 		r.Get("/ws", app.MessagingHandler())
 
 	})
@@ -62,7 +62,7 @@ func main() {
 		r.Use(app.AdminMiddleware())
 		r.Get("/admin", app.AdminPanelHandler())
 		r.Post("/api/room/", app.CreateRoomHandler())
-		r.Post("/api/user/{user_id}", app.UserHandler())
+		r.Post("/api/users/{user_id}", app.UserHandler())
 
 	})
 

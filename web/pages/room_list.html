@@ -56,7 +56,7 @@
             background-color: #007BFF;
             color: #fff;
         }
-
+        
         .modal {
             display: none;
             position: fixed;
@@ -108,6 +108,43 @@
                 width: 80%;
             }
         }
+        .chemical-elements {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .chemical-element {
+       
+        margin-bottom: 10px;
+    }
+
+    .element-img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .chemical-element label {
+        display: block;
+        margin-top: 5px;
+    }
+
+    .chemical-element input {
+        width: calc(20% - 22px); /* Adjust the width of input fields */
+        margin-top: 5px;
+    }
+
+    @media only screen and (max-width: 600px) {
+        .chemical-element {
+            flex: 0 0 100%; /* Make chemical element containers full-width on small screens */
+        }
+    }
+
+    @media only screen and (max-width: 420px) {
+        .chemical-element {
+            flex: 0 0 100%; /* Make chemical element containers full-width on smaller screens */
+        }
+    }
     </style>
 </head>
 
@@ -135,10 +172,10 @@
             <form>
                 <label for="roomName">Название комнаты:</label>
                 <input type="text" name="roomName" id="roomName" required>
-
+            
                 <label for="autoPlay">Авто-игра:</label>
                 <input type="checkbox" name="autoPlay" id="autoPlay">
-
+            
                 <!-- Этот блок будет появляться при выборе "Авто-игра" -->
                 <div id="timeControl" style="display: none;">
                     <label>Время на ход (в секундах):</label>
@@ -148,14 +185,75 @@
                         <option value="60">60 секунд</option>
                     </select>
                 </div>
-
+            
                 <label for="maxPlayers">Макс. количество игроков:</label>
                 <input type="number" id="maxPlayers" min="2">
-
-                <button type="button" onclick="createRoom()">Создать</button>
-                <div id="error">
-                    <!-- <label class='error'></label> -->
+            
+                <!-- Добавленные картинки с химическими элементами и полями ввода -->
+                <div class="chemical-elements">
+                    <div class="chemical-element">
+                        <img src="/path/to/element1.png" alt="Element 1" class="element-img">
+                        
+                        <input type="number" id="element1Count" min="0">
+                    </div>
+            
+                    <!-- Добавьте аналогичные блоки для других элементов -->
+                    <!-- Пример для второго элемента -->
+                    <div class="chemical-element">
+                        <img src="/path/to/element2.png" alt="Element 2" class="element-img">
+                        
+                        <input type="number" id="element2Count" min="0">
+                    </div>
+                    <div class="chemical-element">
+                        <img src="/path/to/element2.png" alt="Element 2" class="element-img">
+                        
+                        <input type="number" id="element2Count" min="0">
+                    </div>
+                    <div class="chemical-element">
+                        <img src="/path/to/element2.png" alt="Element 2" class="element-img">
+                        
+                        <input type="number" id="element2Count" min="0">
+                    </div>
+                    <div class="chemical-element">
+                        <img src="/path/to/element2.png" alt="Element 2" class="element-img">
+                        
+                        <input type="number" id="element2Count" min="0">
+                    </div>
+                    <div class="chemical-element">
+                        <img src="/path/to/element2.png" alt="Element 2" class="element-img">
+                      
+                        <input type="number" id="element2Count" min="0">
+                    </div>
+                    <div class="chemical-element">
+                        <img src="/path/to/element2.png" alt="Element 2" class="element-img">
+                       
+                        <input type="number" id="element2Count" min="0">
+                    </div>
+                    <div class="chemical-element">
+                        <img src="/path/to/element2.png" alt="Element 2" class="element-img">
+                       
+                        <input type="number" id="element2Count" min="0">
+                    </div>
+                    <div class="chemical-element">
+                        <img src="/path/to/element2.png" alt="Element 2" class="element-img">
+                      
+                        <input type="number" id="element2Count" min="0">
+                    </div>
+                    <div class="chemical-element">
+                        <img src="/path/to/element2.png" alt="Element 2" class="element-img">
+                       
+                        <input type="number" id="element2Count" min="0">
+                    </div>
+                    <div class="chemical-element">
+                        <img src="/path/to/element2.png" alt="Element 2" class="element-img">
+                       
+                        <input type="number" id="element2Count" min="0">
+                    </div>
+                    <!-- Повторите аналогичные блоки для других элементов -->
                 </div>
+            
+                <button type="button" onclick="createRoom()">Создать</button>
+                <div id="error"></div>
             </form>
         </div>
     </div>
@@ -199,7 +297,7 @@
             const maxPlayers = document.getElementById('maxPlayers').value;
 
             // Отправить данные на сервер для создания комнаты
-            fetch('/api/room', {
+            fetch('/api/rooms/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -248,7 +346,7 @@
     // Create a hyperlink element
     var roomLink = document.createElement('a');
     roomLink.textContent = name;
-    roomLink.href = '/room/' + name; // Set the href attribute to the room URL
+    roomLink.href = '/rooms/' + name; // Set the href attribute to the room URL
     cell1.appendChild(roomLink);
 
     cell2.innerHTML = (isAuto ? 'Да' : 'Нет');
@@ -268,7 +366,7 @@
 
         // Функция для обновления данных о комнатах на странице
         function updateRoomList() {
-    fetch('/api/room') // Отправить запрос на получение данных
+    fetch('/api/rooms') // Отправить запрос на получение данных
         .then(response => response.json())
         .then(data => {
             var roomTable = document.getElementById('roomTable');
@@ -289,10 +387,10 @@
                 // Create a hyperlink element
                 var roomLink = document.createElement('a');
                 roomLink.textContent = room.Name;
-                roomLink.href = '/room/' + room.Id; // Set the href attribute to the room URL
+                roomLink.href = '/rooms/' + room.Id; // Set the href attribute to the room URL
                 cell1.appendChild(roomLink);
 
-                cell2.innerHTML = (room.is_auto ? 'Да' : 'Нет');
+                cell2.innerHTML = (room.Time > 0 ? 'Да' : 'Нет');
                 cell3.innerHTML = room.Time;
                 cell4.innerHTML = room.Max_partic; // Используем правильное название переменной
 
@@ -340,7 +438,7 @@
         function deleteRoom(roomName) {
             if (confirm('Вы уверены, что хотите удалить эту комнату?')) {
                 // Отправить запрос на сервер для удаления комнаты
-                fetch('/api/room', {
+                fetch('/api/rooms', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
