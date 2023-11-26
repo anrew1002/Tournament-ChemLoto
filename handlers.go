@@ -101,32 +101,18 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 		}
 
 		// http.Redirect(w, r, "/room_list", http.StatusSeeOther)
-		app.writeJSON(w, http.StatusOK, envelope{"errors": nil, "success": true}, nil)
+		app.writeJSON(w, http.StatusCreated, envelope{"errors": nil, "success": true}, nil)
 	}
 }
 
 func (app *App) RoomHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if roomID := chi.URLParam(r, "room_id"); roomID != "" {
-
-			// path := filepath.Join("web", "pages", "room.html")
-
-			// tmpl, err := template.ParseFiles(path)
-			// if err != nil {
-			// 	log.Println(err.Error())
-			// 	http.Error(w, "Internal Error", http.StatusInternalServerError)
-			// }
 			data := struct {
 				Room string
 			}{
 				Room: roomID,
 			}
-
-			// err = tmpl.Execute(w, data)
-			// if err != nil {
-			// 	log.Println(err.Error())
-			// 	http.Error(w, "", http.StatusInternalServerError)
-			// }
 			app.render(w, http.StatusOK, "room", data)
 
 		}
@@ -135,7 +121,27 @@ func (app *App) RoomHandler() http.HandlerFunc {
 func (app *App) RoomDeleteHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if roomID := chi.URLParam(r, "room_id"); roomID != "" {
-			app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"success": true}, nil)
+			app.writeJSON(w, http.StatusOK, envelope{"success": true}, nil)
+		}
+	}
+}
+func (app *App) UserHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if roomID := chi.URLParam(r, "user_id"); roomID != "" {
+			if err := r.ParseForm(); err != nil {
+				fmt.Fprintf(w, "ParseForm() err: %v", err)
+				return
+			}
+			// formErrors := make(map[string]string)
+			if r.FormValue("score") != "" {
+				userSession := r.Context().Value("user").(*sessions.Session)
+				username, ok := userSession.Values["username"].(string)
+				if !ok {
+					log.Println("Fail to type assertion")
+				}
+				app.database.UpdateUserScore(username)
+				app.writeJSON(w, http.StatusOK, envelope{"success": true}, nil)
+			}
 		}
 	}
 }
@@ -205,22 +211,7 @@ func (app *App) PostAdminLoginHandler(AdminCode string) http.HandlerFunc {
 
 func (app *App) LoginHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		// path := filepath.Join("web", "pages", "login.html")
-
-		// tmpl, err := template.ParseFiles(path)
-		// if err != nil {
-		// 	log.Println(err.Error())
-		// 	http.Error(w, "Internal Error", http.StatusInternalServerError)
-		// }
-
-		// err = tmpl.Execute(w, nil)
-		// if err != nil {
-		// 	log.Println(err.Error())
-		// 	http.Error(w, "", http.StatusInternalServerError)
-		// }
 		app.render(w, http.StatusOK, "login", nil)
-
 	}
 }
 
@@ -243,10 +234,6 @@ func (app *App) PostLoginHandler() http.HandlerFunc {
 
 		seed := strconv.Itoa(rand.Intn(1000))
 		data.Username = r.FormValue("name") + "#" + seed
-		// code := r.FormValue("code")
-		// if code == AdminCode {
-		// 	data.Admin = true
-		// }
 		log.Print(data)
 		app.database.AddUser(data)
 		err := SetCookie(w, r, data, app)

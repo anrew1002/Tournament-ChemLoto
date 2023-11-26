@@ -52,7 +52,7 @@ func main() {
 		r.Get("/hub", app.HubHandler())
 		r.Get("/api/room", app.GetRooms())
 		r.Get("/api/user", app.GetUsers())
-		r.Delete("/api/room", app.RoomDeleteHandler())
+		r.Delete("/api/room{room_id}", app.RoomDeleteHandler())
 		r.Get("/room/{room_id}", app.RoomHandler())
 
 	})
@@ -60,7 +60,9 @@ func main() {
 		r.Use(app.AuthMiddleware())
 		r.Use(app.AdminMiddleware())
 		r.Get("/admin", app.AdminPanelHandler())
-		r.Post("/api/room", app.CreateRoomHandler())
+		r.Post("/api/room/", app.CreateRoomHandler())
+		r.Post("/api/user/{user_id}", app.UserHandler())
+
 	})
 
 	items := http.FileServer(http.Dir("./web/items"))
