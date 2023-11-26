@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -120,17 +122,20 @@ func (clnt *wsclient) readerBuffer(app *App) {
 			}
 			break
 		}
+		var wsmsg wsmessage
+		json.Unmarshal([]byte(p), &wsmsg)
+		fmt.Printf("Species: %s, Description: %s", wsmsg.Type, wsmsg.Struct)
 		// TODO: add validation
-		msg := NewMessage(clnt.name, p)
-		// err = env.DB.Messages.AddMessage(msg)
-		if err != nil {
-			log.Println("failed add: ", err)
-		}
-		log.Print("printed: ", string(msg.Struct.(textmessage).Payload))
+		// msg := NewMessage(clnt.name, p)
+		// // err = env.DB.Messages.AddMessage(msg)
+		// if err != nil {
+		// 	log.Println("failed add: ", err)
+		// }
+		// log.Print("printed: ", string(msg.Struct.(textmessage).Payload))
 
-		for _, ws := range clientMngr.wsconnections {
-			ws.channel <- msg
-		}
+		// for _, ws := range clientMngr.wsconnections {
+		// 	ws.channel <- msg
+		// }
 
 	}
 }

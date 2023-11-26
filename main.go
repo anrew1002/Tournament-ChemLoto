@@ -61,7 +61,7 @@ func main() {
 		r.Use(app.AuthMiddleware())
 		r.Use(app.AdminMiddleware())
 		r.Get("/admin", app.AdminPanelHandler())
-		r.Post("/api/room/", app.CreateRoomHandler())
+		r.Post("/api/rooms/", app.CreateRoomHandler())
 		r.Post("/api/users/{user_id}", app.UserHandler())
 
 	})
