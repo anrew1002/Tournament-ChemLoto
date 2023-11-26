@@ -37,12 +37,12 @@
 
         #content input[type="text"],
         #content input[type="password"] {
-            width: 100%;
+            width: calc(100% - 22px); /* Установите отступ справа на 11px */
             padding: 10px;
             margin-bottom: 15px;
-            /* Увеличил отступ между инпутами */
             border: 1px solid #ccc;
             border-radius: 5px;
+            margin-right: 11px; /* Добавленный отступ справа */
         }
 
         #content input[type="checkbox"] {
@@ -54,7 +54,6 @@
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
-            /* Увеличил отступ между кнопками */
             background-color: #007BFF;
             color: #fff;
             border: none;
@@ -86,62 +85,28 @@
             text-align: center;
             margin-top: 10px;
         }
+
     </style>
 </head>
 
 <body>
 
     <div id="header">
-       
+
     </div>
 
     <div id="content">
-        <!-- <h2>Регистрация</h2> -->
-        <!-- <form method="post" action="/signup">
-            <label for="name">Введите имя:</label>
-            <input type="text" name="name" id="name" required>
-
-            <label for="password">Пароль:</label>
-            <input type="password" name="password" id="password" required>
-
-            <input type="checkbox" name="organizer" id="organizer">
-            <label for="organizer">Вы организатор?</label>
-
-            <div class="hidden" id="codeContainer">
-                <label for="code">Введите код:</label>
-                <input type="text" name="code" id="code">
-            </div>
-
-            <button type="submit" name="register">Зарегистрировать</button>
-        </form> -->
-
-        <!-- Форма для входа -->
         <form method="post" action="/">
             <h2>Вход</h2>
             <label for="name">Введите имя:</label>
             <input type="text" name="name" id="name" required>
-            <!-- <label for="loginPassword">Пароль:</label>
-            <input type="password" name="loginPassword" id="loginPassword" required> -->
             <button type="submit" name="login">Войти</button>
         </form>
 
         <div id="error">
-            
-                <label class='error'>{{.name}}</label>
-          
+            <label class='error'>{{.name}}</label>
         </div>
     </div>
-
-    <script>
-        // JavaScript для показа/скрытия поля ввода кода при выборе чекбокса
-        const organizerCheckbox = document.getElementById('organizer');
-        const codeContainer = document.getElementById('codeContainer');
-
-        organizerCheckbox.addEventListener('change', function () {
-            codeContainer.style.display = organizerCheckbox.checked ? 'block' : 'none';
-        });
-     </script>
-
 
 </body>
 

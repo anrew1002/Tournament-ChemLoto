@@ -54,6 +54,7 @@ func main() {
 		r.Get("/api/user", app.GetUsers())
 		r.Delete("/api/room{room_id}", app.RoomDeleteHandler())
 		r.Get("/room/{room_id}", app.RoomHandler())
+		r.Get("/ws", app.MessagingHandler())
 
 	})
 	r.Group(func(r chi.Router) {
@@ -67,6 +68,9 @@ func main() {
 
 	items := http.FileServer(http.Dir("./web/items"))
 	r.Handle("/items/*", http.StripPrefix("/items/", items))
+
+	static := http.FileServer(http.Dir("./web/static"))
+	r.Handle("/static/*", http.StripPrefix("/static/", static))
 
 	r.Get("/", app.LoginHandler())
 	r.Post("/", app.PostLoginHandler())
