@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sync"
 
 	"github.com/gorilla/sessions"
 	"github.com/gorilla/websocket"
@@ -37,41 +36,43 @@ type wsclient struct {
 	name    string
 	manager *clientManager
 	channel chan *wsmessage
+	room    string
 }
 
-func newClient(ws *websocket.Conn, name string) *wsclient {
-	return &wsclient{ws: ws, name: name, channel: make(chan *wsmessage)}
+func newClient(ws *websocket.Conn, name string, room string) *wsclient {
+	return &wsclient{ws: ws, name: name, channel: make(chan *wsmessage), room: room}
 }
 
-type clientManager struct {
-	wsconnections map[string]*wsclient
-	sync.RWMutex
-}
+// type clientManager struct {
+// 	wsconnections map[string]*wsclient
+// 	sync.RWMutex
+// }
 
-func (connM *clientManager) addClient(id string, conn *wsclient) {
-	connM.Lock()
-	defer connM.Unlock()
-	conn.manager = connM
-	connM.wsconnections[id] = conn
-}
+// func (connM *clientManager) addClient(id string, conn *wsclient) {
+// 	connM.Lock()
+// 	defer connM.Unlock()
+// 	conn.manager = connM
+// 	connM.wsconnections[id] = conn
+// }
 
 var webocketUpgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin:     func(r *http.Request) bool { return true }, // allow all conn by default
 }
-var clientMngr clientManager = clientManager{wsconnections: make(map[string]*wsclient, 100)}
 
-func (connM *clientManager) removeClient(conn *wsclient) {
-	connM.Lock()
-	defer connM.Unlock()
+// var clientMngr clientManager = clientManager{wsconnections: make(map[string]*wsclient, 100)}
 
-	if _, ok := connM.wsconnections[conn.name]; ok {
-		delete(connM.wsconnections, conn.name)
-		conn.ws.Close()
-	}
+// func (connM *clientManager) removeClient(conn *wsclient) {
+// 	connM.Lock()
+// 	defer connM.Unlock()
 
-}
+// 	if _, ok := connM.wsconnections[conn.name]; ok {
+// 		delete(connM.wsconnections, conn.name)
+// 		conn.ws.Close()
+// 	}
+
+// }
 
 // MessagingHandler handles offering to Upgrade Websocket connection
 func (app *App) MessagingHandler() http.HandlerFunc {
@@ -84,6 +85,10 @@ func (app *App) MessagingHandler() http.HandlerFunc {
 			log.Println("Fail to type assertion")
 		}
 
+		user, err := app.database.GetUser(username)
+		if err != nil {
+			log.Println("MessagingHandler: ", err.Error())
+		}
 		// upgrade this connection to a WebSocket
 		// connection
 		ws, err := webocketUpgrader.Upgrade(w, r, nil)
@@ -92,8 +97,8 @@ func (app *App) MessagingHandler() http.HandlerFunc {
 		}
 
 		//adding connection to connections pull
-		conn := newClient(ws, username)
-		clientMngr.addClient(userSession.ID, conn)
+		conn := newClient(ws, username, user.Room)
+		app.clientManager.addClient(userSession.ID, user.Room, conn)
 
 		log.Println("Client Connected")
 		// listen indefinitely for new messages coming
@@ -115,7 +120,7 @@ func (app *App) MessagingHandler() http.HandlerFunc {
 // readerBuffer wait messages from client
 func (clnt *wsclient) readerBuffer(app *App) {
 	defer func() {
-		clnt.manager.removeClient(clnt)
+		clnt.manager.removeClient(clnt, clnt.room)
 	}()
 	for {
 		_, p, err := clnt.ws.ReadMessage()
@@ -133,13 +138,13 @@ func (clnt *wsclient) readerBuffer(app *App) {
 
 			log.Print("printed: ", string(msg.Struct.(textMessage).Payload))
 
-			for _, ws := range clientMngr.wsconnections {
+			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
 				ws.channel <- msg
 			}
 		} else {
 			if wsmsg.Type == "raiseHand" {
 				msg := NewMessage("raiseHand", handMessage{Sender: clnt.name})
-				for _, ws := range clientMngr.wsconnections {
+				for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
 					ws.channel <- msg
 				}
 			} else {
@@ -154,7 +159,7 @@ func (clnt *wsclient) readerBuffer(app *App) {
 // writeBuffer write messages from channel to all clients
 func (clnt *wsclient) writeBuffer() {
 	defer func() {
-		clnt.manager.removeClient(clnt)
+		clnt.manager.removeClient(clnt, clnt.room)
 	}()
 	for {
 		select {
