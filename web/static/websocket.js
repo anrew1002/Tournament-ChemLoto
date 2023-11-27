@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', e => {
     message.struct.payload = enc.decode(
       base64ToArrayBuffer(message.struct.payload)
     )
-    messageElem.style.display = 'block'
+    
     messageElem.querySelector('.message__author').textContent =
       message.struct.sender
     messageElem.querySelector('.message__field').textContent =

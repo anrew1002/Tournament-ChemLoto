@@ -68,14 +68,43 @@ header {
     min-width: 120px;
     /* Устанавливаем минимальную ширину */
 }
+.message__content {
+    
+    font-size: 16px; /* Размер шрифта для сообщения */
+    margin-top: 5px; /* Отступ между именем и сообщением */
+}
+.message {
+    /* Ваши существующие стили */
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    width: 200px;
+    margin-top: 10px;
+    display: flex; /* Добавляем flex-контейнер для отображения в колонке */
+    flex-direction: column; /* Отображение в колонке */
+    align-items: flex-start; /* Выравнивание элементов по левому краю */
+    align-items: center;
+}
 
+.message__author {
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 5px; /* Отступ между автором и текстом сообщения */
+}
+  .btn{
+    margin-top: 5px;
+  }
+
+  
+  
 .logout-btn {
     background-color: #1c1c1c;
     /* Красная кнопка выхода */
     color: #fff;
     padding: 10px 15px;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
     min-width: 120px;
@@ -105,7 +134,7 @@ main {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     min-width: 200px;
     max-height: 700px;
-
+    padding-bottom: 0;
     margin: 10px;
     text-align: center;
     background-color: rgb(105, 162, 212);
@@ -206,33 +235,26 @@ main {
     border-radius: 50%;
     opacity: 1;
 }
-
-/* Обновлены стили для чата и поля ввода сообщений */
-.chat {
-    max-height: 700px;
-    /* Установите максимальную высоту блока, при которой появится полоса прокрутки */
-    overflow-y: auto;
-    /* Добавлено свойство для вертикальной полосы прокрутки */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* Выравнивание содержимого по центру */
-}
-
 .chat h2 {
     margin-bottom: 10px;
     /* Отступ между заголовком и содержимым чата */
 }
+/* Обновлены стили для чата и поля ввода сообщений */
+.chat {
+    /* Ваши существующие стили для .chat */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-height: 700px;
+    overflow-y: auto;
+}
 
 .chat-input {
     margin-top: auto;
-    /* Автоматический отступ сверху, чтобы прижать вниз */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     align-items: center;
     width: 100%;
-    /* Чтобы поле ввода занимало всю доступную ширину */
 }
 
 .chat-input input {
@@ -240,6 +262,21 @@ main {
     width: 90%;
     flex-grow: 1;
     margin-bottom: 5px;
+}
+
+.chat-input .btn {
+    background-color: #4682B4;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 90%;
+}
+
+.chat-input .btn:hover {
+    background-color: #1E90FF;
 }
 
 .table-info>span {
@@ -281,7 +318,12 @@ main {
     background-color: #1E90FF;
     /* Голубой цвет при наведении */
 }
-
+.chat-input-wrapper {
+    position: sticky ;
+    bottom: 0 ;
+    padding: 10px ;
+    background-color: rgb(105, 162, 212);
+}
 /* Добавлены ключевые кадры для анимации */
 @keyframes fadeInOut {
 
