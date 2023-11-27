@@ -265,7 +265,7 @@ main {
     margin: 5px;
 }
 
-.raise-hand-btn {
+.raise-hand-btn,.admin-btn {
     background-color: #4682B4;
     /* Синий цвет */
     color: #fff;
@@ -277,7 +277,7 @@ main {
     margin-top: 10px;
 }
 
-.raise-hand-btn:hover {
+.raise-hand-btn,.admin-btn:hover {
     background-color: #1E90FF;
     /* Голубой цвет при наведении */
 }

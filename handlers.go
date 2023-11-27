@@ -115,18 +115,27 @@ func (app *App) RoomHandler() http.HandlerFunc {
 				if !ok {
 					log.Println("Fail to type assertion")
 				}
+
+				admin, ok := userSession.Values["admin"].(bool)
+				if !ok {
+					log.Println("Fail to type assertion")
+				}
+				log.Println("admin", admin)
 				app.database.UpdateUserRoom(username, room.Name)
 				data := struct {
 					Room     string
 					Username string
+					Admin    bool
 				}{
 					Room:     roomID,
 					Username: username,
+					Admin:    admin,
 				}
 				app.render(w, http.StatusOK, "room", data)
 			} else {
 				w.WriteHeader(404)
 				w.Write([]byte("404"))
+
 			}
 		}
 
