@@ -51,6 +51,9 @@ document.addEventListener('DOMContentLoaded', e => {
       case 'chat_text':
         textMessageHandler(data)
         break
+      case 'raiseHand':
+        console.log(data)
+        break
       default:
         console.log('Undefined message type from server')
         break

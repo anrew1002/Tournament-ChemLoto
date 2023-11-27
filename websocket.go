@@ -16,16 +16,19 @@ type wsmessage struct {
 	Struct any    `json:"struct"`
 }
 
-type textmessage struct {
+type textMessage struct {
 	Sender  string `json:"sender"`
 	Payload []byte `json:"payload"`
 }
+type handMessage struct {
+	Sender string `json:"sender"`
+}
 
 // NewMessage ...
-func NewMessage(id string, message []byte) *wsmessage {
+func NewMessage(messageType string, strct any) *wsmessage {
 	return &wsmessage{
-		Type:   "chat_text",
-		Struct: textmessage{Sender: id, Payload: message},
+		Type:   messageType,
+		Struct: strct,
 	}
 }
 
@@ -125,16 +128,24 @@ func (clnt *wsclient) readerBuffer(app *App) {
 		var wsmsg wsmessage
 		if err := json.Unmarshal([]byte(p), &wsmsg); err != nil {
 			// TODO: add validation
-			msg := NewMessage(clnt.name, p)
 
-			log.Print("printed: ", string(msg.Struct.(textmessage).Payload))
+			msg := NewMessage("chat_text", textMessage{Sender: clnt.name, Payload: p})
+
+			log.Print("printed: ", string(msg.Struct.(textMessage).Payload))
 
 			for _, ws := range clientMngr.wsconnections {
 				ws.channel <- msg
 			}
 		} else {
-			fmt.Printf("Species: %s, Description: %s", wsmsg.Type, wsmsg.Struct)
-			fmt.Println()
+			if wsmsg.Type == "raiseHand" {
+				msg := NewMessage("raiseHand", handMessage{Sender: clnt.name})
+				for _, ws := range clientMngr.wsconnections {
+					ws.channel <- msg
+				}
+			} else {
+				fmt.Printf("Species: %s, Description: %s", wsmsg.Type, wsmsg.Struct)
+				fmt.Println()
+			}
 		}
 
 	}
