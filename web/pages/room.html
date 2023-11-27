@@ -15,7 +15,7 @@
             <button class="logout-btn">Выйти</button>
         </div>
         <h1 id="room-title">{{.Room}}</h1>
-        <p class="table-info">Ваш номер стола: <span>{.Username}</span></p>
+        <p class="table-info">Ваш номер стола: <span>{{.Username}}</span></p>
     </header>
 
     <main>
@@ -48,7 +48,7 @@
             </div>
             <div class="chat-input-wrapper">
                 <form name="publish">
-                    <input type="text" name="message" placeholder="Введите сообщение">
+                    <input type="text" name="message" placeholder="Введите сообщение" class="place_message">
                     <input style="background-color: #4682B4; color: #fff;" class='btn' type="submit" value="Отправить">
                 </form>
             </div>

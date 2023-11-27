@@ -81,9 +81,9 @@ header {
     white-space: normal;
     width: 200px;
     margin-top: 10px;
-    display: flex; /* Добавляем flex-контейнер для отображения в колонке */
-    flex-direction: column; /* Отображение в колонке */
-    align-items: flex-start; /* Выравнивание элементов по левому краю */
+    border: 1px solid rgb(207, 207, 207);
+    border-width: 0px 0px 1px 0px;
+    padding-bottom: 10px;
     align-items: center;
 }
 
@@ -483,6 +483,20 @@ main {
             bottom: 10px;
             right: 10px;
 
+        }
+        .chat-input-wrapper {
+            
+            padding:0;
+            
+        }
+        .message{
+            width: 140px;
+        }
+        .place_message{
+            width: 130px;
+        }
+        .chat{
+            padding-bottom: 0;
         }
     }
 }

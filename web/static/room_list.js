@@ -105,6 +105,8 @@ function addRoomToTable(id, name, isAuto, time, maxPlayers, organizer) {
 
 // Функция для обновления данных о комнатах на странице
 function updateRoomList() {
+    var delete_th = document.getElementById("if_admin");
+    
     fetch('/api/rooms') // Отправить запрос на получение данных
         .then(response => response.json())
         .then(data => {
@@ -121,7 +123,11 @@ function updateRoomList() {
                 var cell2 = row.insertCell(1);
                 var cell3 = row.insertCell(2);
                 var cell4 = row.insertCell(3);
-                var cell5 = row.insertCell(4);
+                console.log(cell4)
+                if (delete_th!= null){
+                var cell5 = row.insertCell(4)
+             
+                }
 
                 // Create a hyperlink element
                 var roomLink = document.createElement('a');
@@ -133,6 +139,11 @@ function updateRoomList() {
                 cell3.innerHTML = room.Time;
                 cell4.innerHTML = room.Max_partic; // Используем правильное название переменной
 
+                
+                
+                if (delete_th!= null){
+
+                
                 // Создаем кнопку "Удалить" и устанавливаем для нее обработчик события
                 var deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Удалить';
@@ -141,7 +152,7 @@ function updateRoomList() {
                 });
 
                 // Добавляем кнопку "Удалить" в ячейку
-                cell5.appendChild(deleteButton);
+                cell5.appendChild(deleteButton); }
             });
         })
         .catch(error => console.error('Ошибка при обновлении данных о комнатах: ', error));

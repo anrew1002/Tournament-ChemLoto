@@ -20,7 +20,7 @@
         {{end}}
     </div>
     {{if .Admin}}
-    <button onclick="showCreateRoomForm()">Создать комнату</button>
+    <button id= "if_admin"onclick="showCreateRoomForm()">Создать комнату</button>
     {{end}}
     <!-- Модальное окно для создания комнаты -->
     <div id="createRoomModal" class="modal">
@@ -126,7 +126,7 @@
                 <th>Авто-игра</th>
                 <th>Время на ход</th>
                 <th>Макс. игроков</th>
-                <th>Удалить</th>
+                {{if .Admin}}<th id="delete_button">Удалить</th>{{end}}
             </tr>
         </table>
     </div>
