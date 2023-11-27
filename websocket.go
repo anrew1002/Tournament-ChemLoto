@@ -123,19 +123,19 @@ func (clnt *wsclient) readerBuffer(app *App) {
 			break
 		}
 		var wsmsg wsmessage
-		json.Unmarshal([]byte(p), &wsmsg)
-		fmt.Printf("Species: %s, Description: %s", wsmsg.Type, wsmsg.Struct)
-		// TODO: add validation
-		// msg := NewMessage(clnt.name, p)
-		// // err = env.DB.Messages.AddMessage(msg)
-		// if err != nil {
-		// 	log.Println("failed add: ", err)
-		// }
-		// log.Print("printed: ", string(msg.Struct.(textmessage).Payload))
+		if err := json.Unmarshal([]byte(p), &wsmsg); err != nil {
+			// TODO: add validation
+			msg := NewMessage(clnt.name, p)
 
-		// for _, ws := range clientMngr.wsconnections {
-		// 	ws.channel <- msg
-		// }
+			log.Print("printed: ", string(msg.Struct.(textmessage).Payload))
+
+			for _, ws := range clientMngr.wsconnections {
+				ws.channel <- msg
+			}
+		} else {
+			fmt.Printf("Species: %s, Description: %s", wsmsg.Type, wsmsg.Struct)
+			fmt.Println()
+		}
 
 	}
 }

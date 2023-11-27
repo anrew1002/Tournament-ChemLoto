@@ -72,10 +72,14 @@ func main() {
 	static := http.FileServer(http.Dir("./web/static"))
 	r.Handle("/static/*", http.StripPrefix("/static/", static))
 
-	r.Get("/", app.LoginHandler())
-	r.Post("/", app.PostLoginHandler())
-	r.Get("/admin_login", app.AdminLoginHandler())
-	r.Post("/admin_login", app.PostAdminLoginHandler(*AdminCode))
+	r.Group(func(r chi.Router) {
+		r.Use(app.ReAuthMiddleware())
+		r.Get("/", app.LoginHandler())
+		r.Post("/", app.PostLoginHandler())
+		r.Get("/admin_login", app.AdminLoginHandler())
+		r.Post("/admin_login", app.PostAdminLoginHandler(*AdminCode))
+	})
+
 	srv := &http.Server{
 		Addr:    *addr,
 		Handler: r,

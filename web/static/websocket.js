@@ -1,5 +1,5 @@
 'use strict'
-
+var socket = new WebSocket('ws://127.0.0.1:80/ws')
 document.addEventListener('DOMContentLoaded', e => {
   // get important elements
   const dialod_window = document.querySelector('.messages')
@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', e => {
     .getElementById('start_message')
     .cloneNode(true)
   let accounts_map = new Map()
-  let socket = setWebsocket()
+  setWebsocket()
 
   function setWebsocket () {
-    let socket = new WebSocket('ws://127.0.0.1:80/ws')
+    socket = new WebSocket('ws://127.0.0.1:80/ws')
     socket.onmessage = function (event) {
       messageHandler(JSON.parse(event.data))
     }
@@ -29,16 +29,17 @@ document.addEventListener('DOMContentLoaded', e => {
     socket.onopen = function (e) {
       // status.textContent = 'Онлайн'
     }
-    document.forms['publish'].onsubmit = function () {
-      let outgoingMessage = this.message.value
-      this.message.value = ''
-      if (outgoingMessage != '') {
-        // console.log(outgoingMessage)
-        socket.send(outgoingMessage)
-      }
-      return false
-    }
+
     return socket
+  }
+  document.forms['publish'].onsubmit = function () {
+    let outgoingMessage = this.message.value
+    this.message.value = ''
+    if (outgoingMessage != '') {
+      // console.log(outgoingMessage)
+      socket.send(outgoingMessage)
+    }
+    return false
   }
 
   async function messageHandler (data) {

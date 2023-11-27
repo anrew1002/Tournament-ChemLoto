@@ -36,7 +36,7 @@ function createRoom() {
     const maxPlayers = document.getElementById('maxPlayers').value;
 
     // Отправить данные на сервер для создания комнаты
-    fetch('/api/room/', {
+    fetch('/api/rooms/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',

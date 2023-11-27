@@ -92,51 +92,48 @@ document.getElementById('topToggle').onclick = function () {
     if (topElement.style.display === 'none') topElement.style.display = 'block';
     else topElement.style.display = 'none';
 };
+// function raiseHand() {
+
+//     // Создаем один раз экземпляр WebSocket
+//     // const wsUrl = 'ws://127.0.0.1/ws';
+//     // const socket = new WebSocket(wsUrl);
+
+//     // // Слушаем событие открытия соединения
+//     // socket.addEventListener('open', (event) => {
+//     //     console.log('WebSocket connection opened:', event);
+//     // });
+
+//     // // Слушаем событие закрытия соединения
+//     // socket.addEventListener('close', (event) => {
+//     //     console.log('WebSocket connection closed:', event);
+//     // });
+
+//     // // Слушаем событие ошибки
+//     // socket.addEventListener('error', (error) => {
+//     //     console.error('WebSocket error:', error);
+//     // });
+
+//     // Слушаем события от сервера
+//     socket.addEventListener('message', (event) => {
+//         const data = JSON.parse(event.data);
+
+//         // Проверяем тип сообщения
+//         if (data.type === 'raiseHandNotification') {
+//             // Ваш код для обработки уведомления о поднятии руки
+//             console.log('Кто-то поднял руку!');
+//             // Здесь вы можете выполнить какие-то действия для отображения уведомления на странице
+//         }
+//     });
+
+//     // Ваша функция для отправки уведомления о поднятии руки
+  
+// }
 function raiseHand() {
-    // Добавьте следующий код для отправки уведомления на сервер WebSocket
+    // Создаем объект сообщения
     const message = {
         type: 'raiseHand',
-    }
+    };
 
-    // Создаем один раз экземпляр WebSocket
-    const wsUrl = 'ws://127.0.0.1/ws';
-    const socket = new WebSocket(wsUrl);
-
-    // Слушаем событие открытия соединения
-    socket.addEventListener('open', (event) => {
-        console.log('WebSocket connection opened:', event);
-    });
-
-    // Слушаем событие закрытия соединения
-    socket.addEventListener('close', (event) => {
-        console.log('WebSocket connection closed:', event);
-    });
-
-    // Слушаем событие ошибки
-    socket.addEventListener('error', (error) => {
-        console.error('WebSocket error:', error);
-    });
-
-    // Слушаем события от сервера
-    socket.addEventListener('message', (event) => {
-        const data = JSON.parse(event.data);
-
-        // Проверяем тип сообщения
-        if (data.type === 'raiseHandNotification') {
-            // Ваш код для обработки уведомления о поднятии руки
-            console.log('Кто-то поднял руку!');
-            // Здесь вы можете выполнить какие-то действия для отображения уведомления на странице
-        }
-    });
-
-    // Ваша функция для отправки уведомления о поднятии руки
-    function raiseHand() {
-        // Создаем объект сообщения
-        const message = {
-            type: 'raiseHand',
-        };
-
-        // Отправляем сообщение на сервер
-        socket.send(JSON.stringify(message));
-    }
+    // Отправляем сообщение на сервер
+    socket.send(JSON.stringify(message));
 }
