@@ -41,6 +41,20 @@ func (s Storage) CreateRoom(room models.Room) error {
 	return wrapDBError(err)
 
 }
+func (s Storage) GetRoom(room_id string) (models.Room, error) {
+	result := s.QueryRow("SELECT * FROM rooms WHERE name = $1 ", room_id)
+
+	// defer result.Close()
+	room := models.Room{}
+	err := result.Scan(&room.Name, &room.Time, &room.Max_partic)
+	if err != nil {
+		// log.Println(err)
+		return room, err
+	}
+
+	return room, nil
+}
+
 func (s Storage) GetRooms() []models.Room {
 	result, err := s.Query("SELECT * FROM rooms")
 	if err != nil {
@@ -85,6 +99,20 @@ func (s Storage) GetUsers() []models.User {
 	}
 	return users
 }
+func (s Storage) GetUser(username string) (models.User, error) {
+	result := s.QueryRow("SELECT * FROM users WHERE username = $1 ", username)
+
+	// defer result.Close()
+	user := models.User{}
+	err := result.Scan(&user.Username, &user.Score, &user.Room, &user.Admin)
+	if err != nil {
+		// log.Println(err)
+		return user, err
+	}
+
+	return user, nil
+}
+
 func wrapDBError(err error) error {
 	var sqliteErr sqlite3.Error
 	if errors.As(err, &sqliteErr) {
@@ -108,6 +136,7 @@ func (s Storage) AddUser(user *models.User) {
 	// }
 	// user.Id = strconv.FormatInt(id, 10)
 }
+
 func (s Storage) UpdateUserScore(user string) error {
 	_, err := s.Exec(`UPDATE users
 								SET score = score + $1
@@ -115,5 +144,14 @@ func (s Storage) UpdateUserScore(user string) error {
 									username = $2
 								`,
 		1, user)
+	return err
+}
+func (s Storage) UpdateUserRoom(user string, room string) error {
+	_, err := s.Exec(`UPDATE users
+								SET room = $1
+								WHERE
+									username = $2
+								`,
+		room, user)
 	return err
 }

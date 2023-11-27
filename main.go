@@ -16,8 +16,9 @@ import (
 )
 
 type App struct {
-	database sqlite.Storage
-	CS       *sqlitestore.SqliteStore
+	database      sqlite.Storage
+	CS            *sqlitestore.SqliteStore
+	clientManager *clientManager
 }
 
 func checkFileExists(filePath string) bool {
@@ -35,15 +36,9 @@ func main() {
 	}
 	// key := securecookie.GenerateRandomKey(32)
 	// log.Print(key)
-	app := &App{
-		database: sqlite.NewStorage(),
-		// CS:       sessions.NewCookieStore([]byte("82 47 76 29 241 16 238 7 14 186 175 11 19 12 26 152 213 18 216 253 135 57 56 126 139 198 242 151 175 11 25 90")),
-	}
-	cs, err := sqlitestore.NewSqliteStoreFromConnection(app.database, "sessions", "/", 2592000, []byte("82 47 76 29 241 16 238 7 14 186 175 11 19 12 26 152 213 18 216 253 135 57 56 126 139 198 242 151 175 11 25 90"))
-	if err != nil {
-		panic("failed connect to sqlitestore")
-	}
-	app.CS = cs
+	// CS:       sessions.NewCookieStore([]byte("82 47 76 29 241 16 238 7 14 186 175 11 19 12 26 152 213 18 216 253 135 57 56 126 139 198 242 151 175 11 25 90")),
+	app := MustInitApp()
+
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Group(func(r chi.Router) {
@@ -87,4 +82,18 @@ func main() {
 
 	log.Printf("Starting server on: %s", *addr)
 	log.Fatal(srv.ListenAndServe())
+}
+
+func MustInitApp() *App {
+	app := new(App)
+	app.database = sqlite.NewStorage()
+
+	cs, err := sqlitestore.NewSqliteStoreFromConnection(app.database, "sessions", "/", 2592000, []byte("82 47 76 29 241 16 238 7 14 186 175 11 19 12 26 152 213 18 216 253 135 57 56 126 139 198 242 151 175 11 25 90"))
+	if err != nil {
+		panic("failed connect to sqlitestore")
+	}
+	app.CS = cs
+
+	app.clientManager = newClientManager(app.database)
+	return app
 }

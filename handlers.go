@@ -87,19 +87,19 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 		err = app.database.CreateRoom(*data)
 		fmt.Printf("err: %T\n", err)
 		log.Print(err)
-		if errors.Is(err, sqlite.ErrDup) {
-			// log.Print(err)
-			formErrors["ErrRoomName"] = "Такая комната уже существует!"
-		}
-		if len(formErrors) != 0 {
-			// app.render(w, http.StatusUnprocessableEntity, "room_list", formErrors)
-			err = app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": formErrors, "success": false}, nil)
-			if err != nil {
-				log.Println(err)
+		if err != nil {
+			if errors.Is(err, sqlite.ErrDup) {
+				// log.Print(err)
+				formErrors["ErrRoomName"] = "Такая комната уже существует!"
+				err = app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": formErrors, "success": false}, nil)
+				if err != nil {
+					log.Println(err)
+				}
 			}
 			return
 		}
 
+		app.clientManager.addRoom(*data)
 		// http.Redirect(w, r, "/room_list", http.StatusSeeOther)
 		app.writeJSON(w, http.StatusCreated, envelope{"errors": nil, "success": true}, nil)
 	}
@@ -108,16 +108,31 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 func (app *App) RoomHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if roomID := chi.URLParam(r, "room_id"); roomID != "" {
-			data := struct {
-				Room string
-			}{
-				Room: roomID,
+			// log.Println(roomID)
+			if room, err := app.database.GetRoom(roomID); err == nil {
+				userSession := r.Context().Value("user").(*sessions.Session)
+				username, ok := userSession.Values["username"].(string)
+				if !ok {
+					log.Println("Fail to type assertion")
+				}
+				app.database.UpdateUserRoom(username, room.Name)
+				data := struct {
+					Room     string
+					Username string
+				}{
+					Room:     roomID,
+					Username: username,
+				}
+				app.render(w, http.StatusOK, "room", data)
+			} else {
+				w.WriteHeader(404)
+				w.Write([]byte("404"))
 			}
-			app.render(w, http.StatusOK, "room", data)
-
 		}
+
 	}
 }
+
 func (app *App) RoomDeleteHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if roomID := chi.URLParam(r, "room_id"); roomID != "" {
@@ -158,10 +173,11 @@ func (app *App) UserHandler() http.HandlerFunc {
 }
 func (app *App) GetUsers() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		users := sqlite.NewStorage().GetUsers()
+		users := app.database.GetUsers()
 		app.writeJSON(w, http.StatusOK, envelope{"users": users}, nil)
 	}
 }
+
 func (app *App) AdminPanelHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userSession := r.Context().Value("user").(*sessions.Session)

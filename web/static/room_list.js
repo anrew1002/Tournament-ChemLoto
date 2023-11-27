@@ -126,7 +126,7 @@ function updateRoomList() {
                 // Create a hyperlink element
                 var roomLink = document.createElement('a');
                 roomLink.textContent = room.Name;
-                roomLink.href = '/rooms/' + room.Id; // Set the href attribute to the room URL
+                roomLink.href = '/rooms/' + room.Name; // Set the href attribute to the room URL
                 cell1.appendChild(roomLink);
 
                 cell2.innerHTML = (room.Time > 0 ? 'Да' : 'Нет');

@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Добавлено условие для анимации смены картинки
         if (initialTime <= 0) {
-            imageElement.src = "chem_el2.png";
+            imageElement.src = "/items/chem_el2.png";
             resetTimer();
         }
 
@@ -51,12 +51,13 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 const topPlayersList = document.getElementById("topPlayersList");
-
+                const roomName = document.getElementById("room-title");
+                console.log(data)
                 // Clear existing list
                 topPlayersList.innerHTML = "";
-
+                
                 // Фильтруем пользователей по комнате (замените "Название Комнаты" на фактическое название комнаты)
-                const usersInRoom = data.users.filter(user => user.Room === "");
+                const usersInRoom = data.users.filter(user => user.Room === roomName.textContent);
 
                 // Sort users by score in descending order
                 usersInRoom.sort((a, b) => b.Score - a.Score);
