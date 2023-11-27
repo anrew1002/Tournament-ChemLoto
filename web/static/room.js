@@ -137,3 +137,12 @@ function raiseHand() {
     // Отправляем сообщение на сервер
     socket.send(JSON.stringify(message));
 }
+function getElement() {
+    // Создаем объект сообщения
+    const message = {
+        type: 'getElement',
+    };
+
+    // Отправляем сообщение на сервер
+    socket.send(JSON.stringify(message));
+}

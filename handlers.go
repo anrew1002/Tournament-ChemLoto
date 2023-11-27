@@ -108,10 +108,20 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 func (app *App) RoomHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if roomID := chi.URLParam(r, "room_id"); roomID != "" {
+
+			userSession := r.Context().Value("user").(*sessions.Session)
+			admin, ok := userSession.Values["admin"].(bool)
+			if !ok {
+				log.Println("Fail to type assertion")
+			}
+			log.Println("admin", admin)
+
 			data := struct {
-				Room string
+				Room  string
+				Admin bool
 			}{
-				Room: roomID,
+				Room:  roomID,
+				Admin: admin,
 			}
 			app.render(w, http.StatusOK, "room", data)
 
