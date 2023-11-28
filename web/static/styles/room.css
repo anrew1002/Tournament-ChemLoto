@@ -385,7 +385,109 @@ main {
     cursor: pointer;
     margin-top: 10px;
 }
+.score-block {
+	display: inline-block;
+	margin-right: 10px;
+}
+.score-block input[type=checkbox] {
+	opacity: 0;
+}
+.score-block label {
+	display: inline-block;
+	cursor: pointer;
+	padding: 0px 15px;
+	line-height: 34px;
+	border: 1px solid #999;
+	border-radius: 6px;
+	user-select: none;
+}
+ .penalty-block{
+    padding-top: 20px;
+    padding-bottom: 20px;
+ }
+ .manual-input {
+    margin-top: 10px;
+}
 
+.manual-input label {
+    display: block;
+    margin-bottom: 5px;
+}
+#notification-container {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 250px;
+    padding: 15px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    transition: opacity 1s ease-in-out;
+}
+
+/* CSS для вашего уведомления */
+#notification-container {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 250px;
+    padding: 15px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    transition: opacity 1s ease-in-out;
+}
+
+#notification-container.show {
+    display: block;
+}
+
+#notification-container {
+    font-size: 60px;
+    text-align: center;
+}
+
+/* CSS для скрытия элемента audio */
+#notification-sound {
+    display: none;
+}
+.manual-input input[type="number"] {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #999;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.manual-input input[type="number"]:focus {
+    border-color: #4682B4; /* Цвет рамки при фокусе */
+    box-shadow: 0 0 5px rgba(70, 130, 180, 0.7); /* Тень при фокусе */
+}
+/* Checked */
+.score-block input[type=checkbox]:checked + label {
+	background: #62a3dc;
+}
+ 
+/* Hover */
+.score-block label:hover {
+	color: #b8b8b8;
+}
+ 
+/* Disabled */
+.score-block input[type=radio]:disabled + label {
+	background: #efefef;
+	color: #666;
+}
 #modalButton:hover {
     background-color: #355d80; /* Цвет кнопки при наведении */
 }

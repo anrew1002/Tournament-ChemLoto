@@ -49,16 +49,40 @@ document.addEventListener('DOMContentLoaded', e => {
     // }
     switch (data.type) {
       case 'chat_text':
-        textMessageHandler(data)
-        break
+          textMessageHandler(data);
+          break;
       case 'raiseHand':
-        console.log(data)
-        break
+          console.log(data);
+          raiseHandNotification(data.struct.sender); // Передаем имя пользователя
+          
+          break;
       default:
-        console.log('Undefined message type from server')
-        break
-    }
+          console.log('Undefined message type from server');
+          break;
   }
+  }
+  function raiseHandNotification(username) {
+    const notificationContainer = document.getElementById('notification-container');
+    const notificationText = document.getElementById('notification-text');
+
+    // Устанавливаем текст уведомления с именем пользователя
+    notificationText.textContent = `${username} поднял руку!`;
+
+    // Показываем уведомление
+    notificationContainer.classList.add('show');
+
+    // Проигрываем звук
+    playNotificationSound();
+
+    // Скрываем уведомление через 5 секунд
+    setTimeout(function () {
+        notificationContainer.classList.remove('show');
+    }, 8000);
+}
+function playNotificationSound() {
+  var notificationSound = document.getElementById('notification-sound');
+  notificationSound.play();
+}
   function textMessageHandler (message) {
     console.log(message)
     let messageElem = message_template.cloneNode(true)

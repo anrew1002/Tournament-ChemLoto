@@ -22,7 +22,9 @@ func (app *App) AdminMiddleware() func(http.Handler) http.Handler {
 			} else {
 				http.Redirect(w, r, "/admin_login", http.StatusFound)
 			}
+
 		})
+
 	}
 }
 

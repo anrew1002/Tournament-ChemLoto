@@ -77,6 +77,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     listItem.addEventListener("click", function () {
                         if (isAdmin === "true") {
                             console.log('isAdmin');
+                            // Сохраните имя пользователя в глобальной переменной
+                            selectedUsername = user.Username;
                             openModal(user); // Open the modal for the selected player
                         }
                     });
@@ -94,10 +96,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // Set up an interval to periodically update the top players table
     setInterval(fetchAndUpdateTopPlayers, 20000); // Update every minute (adjust as needed)
     var selectedUsername;
-
     function openModal(player) {
         console.log('da')
         var modal = document.getElementById("myModal");
+        var modalTitle = document.getElementById("modalTitle");
+        
+        // Изменяем текст заголовка в соответствии с именем игрока
+        modalTitle.textContent = "Начислить очки игроку: " + player.Username;
+    
         modal.style.display = "block";
         document.getElementById("playerName").textContent = "Игрок: " + player.Username;
     
@@ -123,6 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function sendScores() {
         // Получите значения из полей формы
         const alphaScore = getSelectedScore(document.getElementById("alphaBlock"))
+
         const betaScore = getSelectedScore(document.getElementById("betaBlock"))
         const gammaScore = getSelectedScore(document.getElementById("gammaBlock"))
         console.log(alphaScore)
@@ -220,6 +227,7 @@ function raiseHand() {
     // Отправляем сообщение на сервер
     socket.send(JSON.stringify(message));
 }
+
 function getElement() {
     // Создаем объект сообщения
     const message = {
