@@ -122,34 +122,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function sendScores() {
         // Получите значения из полей формы
-        var alphaScore = getSelectedScore(document.getElementById("alphaBlock"));
-        var betaScore = getSelectedScore(document.getElementById("betaBlock"));
-        var gammaScore = getSelectedScore(document.getElementById("gammaBlock"));
+        const alphaScore = getSelectedScore(document.getElementById("alphaBlock"))
+        const betaScore = getSelectedScore(document.getElementById("betaBlock"))
+        const gammaScore = getSelectedScore(document.getElementById("gammaBlock"))
+        console.log(alphaScore)
     
-        // Закодируйте selectedUsername
+        // Замените 'selectedUsername' на актуальное значение имени пользователя
         const encodedUsername = encodeURIComponent(selectedUsername);
     
         // Отправьте данные на сервер
         fetch('/api/users/' + encodedUsername, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: JSON.stringify({
-                score: alphaScore
-                // Другие поля, если необходимо
+            body: new URLSearchParams({
+                score:alphaScore
             }),
         })
         .then(response => response.json())
         .then(data => {
-            // Обработайте ответ от сервера, если необходимо
-            console.log('Success:', data);
-            console.log(selectedUsername);
+            console.log(data);
+            if (data.success) {
+                // Обработайте успешный ответ от сервера, если необходимо
+                console.log('Очки успешно отправлены');
+            } else {
+                // Обработайте ошибку от сервера, если необходимо
+                console.error('Ошибка при отправке очков:', data.errors);
+            }
         })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+        .catch(error => console.error('Ошибка при отправке очков: ' + error));
     }
+    
     
     
     document.getElementById("modalButton").addEventListener("click", function () {

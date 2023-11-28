@@ -137,15 +137,16 @@ func (s Storage) AddUser(user *models.User) {
 	// user.Id = strconv.FormatInt(id, 10)
 }
 
-func (s Storage) UpdateUserScore(user string) error {
+func (s Storage) UpdateUserScore(user string, scoreDelta int) error {
 	_, err := s.Exec(`UPDATE users
 								SET score = score + $1
 								WHERE
 									username = $2
 								`,
-		1, user)
+		scoreDelta, user)
 	return err
 }
+
 func (s Storage) UpdateUserRoom(user string, room string) error {
 	_, err := s.Exec(`UPDATE users
 								SET room = $1

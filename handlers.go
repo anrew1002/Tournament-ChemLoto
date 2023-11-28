@@ -161,13 +161,14 @@ func (app *App) UserHandler() http.HandlerFunc {
 			log.Println("update score on: ", r.FormValue("score"), roomID)
 			// formErrors := make(map[string]string)
 			if r.FormValue("score") != "" {
-
+				score := r.FormValue("score")
 				// userSession := r.Context().Value("user").(*sessions.Session)
 				// username, ok := userSession.Values["username"].(string)
 				// if !ok {
 				// 	log.Println("Fail to type assertion")
 				// }
-				err := app.database.UpdateUserScore(roomID)
+				scoreValue, err := strconv.Atoi(score)
+				err = app.database.UpdateUserScore(roomID, scoreValue)
 				if err != nil {
 					app.writeJSON(w, http.StatusBadRequest, envelope{"success": false}, nil)
 				}
