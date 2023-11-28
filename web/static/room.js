@@ -1,8 +1,10 @@
+
 document.addEventListener("DOMContentLoaded", function () {
     var timerElement = document.querySelector(".timer");
     var imageElement = document.getElementById("elementImage");
     var initialTime = 20;
 
+   
     function updateTimer() {
         timerElement.textContent = formatTime(initialTime);
 
@@ -46,40 +48,116 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     updateTimer();
+    var isAdmin = document.getElementById("isAdmin").textContent;
+    console.log(isAdmin);
+    
     function fetchAndUpdateTopPlayers() {
         fetch("/api/users")
             .then(response => response.json())
             .then(data => {
                 const topPlayersList = document.getElementById("topPlayersList");
                 const roomName = document.getElementById("room-title");
-                console.log(data)
+                console.log(data);
+                console.log(isAdmin)
                 // Clear existing list
                 topPlayersList.innerHTML = "";
-                
+    
                 // Фильтруем пользователей по комнате (замените "Название Комнаты" на фактическое название комнаты)
                 const usersInRoom = data.users.filter(user => user.Room === roomName.textContent);
-
+    
                 // Sort users by score in descending order
                 usersInRoom.sort((a, b) => b.Score - a.Score);
-
+    
                 // Loop through the sorted user data and update the table
                 usersInRoom.forEach(user => {
                     const listItem = document.createElement("li");
                     listItem.textContent = `${user.Username} - ${user.Score} очков`;
+    
+                    // Add a click event listener to each player name
+                    listItem.addEventListener("click", function () {
+                        if (isAdmin === "true") {
+                            console.log('isAdmin');
+                            openModal(user); // Open the modal for the selected player
+                        }
+                    });
+    
                     topPlayersList.appendChild(listItem);
                 });
             })
             .catch(error => console.error("Error fetching user data:", error));
     }
-
-
-    // ... (existing code)
-
-    // Fetch and update top players initially
+    
+    // Вызовите функцию без передачи значения isAdmin
     fetchAndUpdateTopPlayers();
+    
 
     // Set up an interval to periodically update the top players table
-    setInterval(fetchAndUpdateTopPlayers, 1000); // Update every minute (adjust as needed)
+    setInterval(fetchAndUpdateTopPlayers, 20000); // Update every minute (adjust as needed)
+    var selectedUsername;
+
+    function openModal(player) {
+        console.log('da')
+        var modal = document.getElementById("myModal");
+        modal.style.display = "block";
+        document.getElementById("playerName").textContent = "Игрок: " + player.Username;
+    
+        // Сохраните имя пользователя в глобальной переменной
+        selectedUsername = player.Username;
+        const encodedUsername = encodeURIComponent(selectedUsername);
+    }
+    
+    function closeModal() {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+    }
+    
+    // Обработчик клика по кнопке закрытия (крестик)
+    document.querySelector(".close-btn").addEventListener("click", closeModal);
+
+    function getSelectedScore(block) {
+        // Get the value of the selected radio button in a block
+        var selectedRadio = block.querySelector("input:checked");
+        return selectedRadio ? selectedRadio.value : null;
+    }
+
+    function sendScores() {
+        // Получите значения из полей формы
+        var alphaScore = getSelectedScore(document.getElementById("alphaBlock"));
+        var betaScore = getSelectedScore(document.getElementById("betaBlock"));
+        var gammaScore = getSelectedScore(document.getElementById("gammaBlock"));
+    
+        // Закодируйте selectedUsername
+        const encodedUsername = encodeURIComponent(selectedUsername);
+    
+        // Отправьте данные на сервер
+        fetch('/api/users/' + encodedUsername, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                score: alphaScore
+                // Другие поля, если необходимо
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Обработайте ответ от сервера, если необходимо
+            console.log('Success:', data);
+            console.log(selectedUsername);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+    
+    
+    document.getElementById("modalButton").addEventListener("click", function () {
+        // Call the sendScores function
+        sendScores();
+        // Close the modal or perform other actions as needed
+        closeModal();
+    });
 });
 document.getElementById('chatToggle').onclick = function () {
     var chatElement = document.querySelector('.chat');
@@ -147,3 +225,6 @@ function getElement() {
     // Отправляем сообщение на сервер
     socket.send(JSON.stringify(message));
 }
+
+        
+

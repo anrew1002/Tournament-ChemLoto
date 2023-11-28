@@ -63,8 +63,39 @@
         <img class="element-img" src="/items/chem_el2.png" alt="Элемент 4">
         <img class="element-img" src="/items/chem_el.png" alt="Элемент 5">
     </div>
-    <script src="../static/room.js" defer></script>
+    
 
+
+    <script src="../static/room.js" defer></script>
+<div id="isAdmin" display="none">{{.Admin}}</div>
+    <!-- HTML-код для модального окна -->
+    <div class="modal" id="myModal" style="display: none;">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div class="score-block" id="alphaBlock">
+            <p id="playerName"></p>
+            <h3>Alpha</h3>
+            <input type="radio" name="alpha" value="1"><label>1</label>
+            <input type="radio" name="alpha" value="2"><label>2</label>
+            <input type="radio" name="alpha" value="3"><label>3</label>
+            <input type="radio" name="alpha" value="4"><label>4</label>
+        </div>
+        <div class="score-block" id="betaBlock">
+            <h3>Beta</h3>
+            <input type="radio" name="beta" value="1"><label>1</label>
+            <input type="radio" name="beta" value="2"><label>2</label>
+            <input type="radio" name="beta" value="3"><label>3</label>
+            <input type="radio" name="beta" value="4"><label>4</label>
+        </div>
+        <div class="score-block" id="gammaBlock">
+            <h3>Gamma</h3>
+            <input type="radio" name="gamma" value="1"><label>1</label>
+            <input type="radio" name="gamma" value="2"><label>2</label>
+            <input type="radio" name="gamma" value="3"><label>3</label>
+            <input type="radio" name="gamma" value="4"><label>4</label>
+        </div>
+        <button type="button" id="modalButton">Начислить очки</button>
+    </div>
+    
 </body>
 
 </html>
