@@ -12,7 +12,7 @@
 
     <header>
         <div class="user-info">
-            <button class="logout-btn">Выйти</button>
+            <a class="logout-btn" href="/hub">Выйти</button></a>
         </div>
         <h1 id="room-title">{{.Room}}</h1>
         <p class="table-info">Ваш номер стола: <span>{{.Username}}</span></p>
@@ -99,12 +99,12 @@
         <button type="button" id="modalButton">Начислить очки</button>
     </div>
     <!-- HTML-код для вашего уведомления с добавленным элементом audio -->
-<div id="notification-container">
-    <p id="notification-text">Кто-то поднял руку!</p>
-    <audio id="notification-sound">
-        <source src="/static/sounds/notification.mp3" type="audio/mp3">
-    </audio>
-</div>
+    <div id="notification-container">
+        <p id="notification-text">Кто-то поднял руку!</p>
+        <audio id="notification-sound">
+            <source src="/static/sounds/notification.mp3" type="audio/mp3">
+        </audio>
+    </div>
 
 </body>
 

@@ -1,5 +1,5 @@
 'use strict'
-var socket = new WebSocket('ws://127.0.0.1:80/ws')
+var socket
 document.addEventListener('DOMContentLoaded', e => {
   // get important elements
   const dialod_window = document.querySelector('.messages')
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', e => {
         'Socket is closed. Reconnect will be attempted in 1 second.',
         e.reason
       )
-      status.textContent = 'Офлайн'
+      // status.textContent = 'Офлайн'
       setTimeout(function () {
         setWebsocket()
       }, 1000)
@@ -33,13 +33,19 @@ document.addEventListener('DOMContentLoaded', e => {
     return socket
   }
   document.forms['publish'].onsubmit = function () {
-    let outgoingMessage = this.message.value
-    this.message.value = ''
-    if (outgoingMessage != '') {
-      // console.log(outgoingMessage)
-      socket.send(outgoingMessage)
-    }
-    return false
+    e.preventDefault()
+    // console.log(this.message.value)
+    // const chat_message = {
+    //   type: 'chat_text',
+    //   struct: JSON.stringify(this.message.value)
+    // }
+    // // let outgoingMessage = this.message.value
+    // this.message.value = ''
+    // if (outgoingMessage != '') {
+    //   // console.log(outgoingMessage)
+    //   socket.send(chat_message)
+    // }
+    // return false
   }
 
   async function messageHandler (data) {
@@ -49,47 +55,49 @@ document.addEventListener('DOMContentLoaded', e => {
     // }
     switch (data.type) {
       case 'chat_text':
-          textMessageHandler(data);
-          break;
+        textMessageHandler(data)
+        break
       case 'raiseHand':
-          console.log(data);
-          raiseHandNotification(data.struct.sender); // Передаем имя пользователя
-          
-          break;
+        console.log(data)
+        raiseHandNotification(data.struct.sender) // Передаем имя пользователя
+
+        break
       default:
-          console.log('Undefined message type from server');
-          break;
+        console.log('Undefined message type from server')
+        break
+    }
   }
-  }
-  function raiseHandNotification(username) {
-    const notificationContainer = document.getElementById('notification-container');
-    const notificationText = document.getElementById('notification-text');
+  function raiseHandNotification (username) {
+    const notificationContainer = document.getElementById(
+      'notification-container'
+    )
+    const notificationText = document.getElementById('notification-text')
 
     // Устанавливаем текст уведомления с именем пользователя
-    notificationText.textContent = `${username} поднял руку!`;
+    notificationText.textContent = `${username} поднял руку!`
 
     // Показываем уведомление
-    notificationContainer.classList.add('show');
+    notificationContainer.classList.add('show')
 
     // Проигрываем звук
-    playNotificationSound();
+    playNotificationSound()
 
     // Скрываем уведомление через 5 секунд
     setTimeout(function () {
-        notificationContainer.classList.remove('show');
-    }, 8000);
-}
-function playNotificationSound() {
-  var notificationSound = document.getElementById('notification-sound');
-  notificationSound.play();
-}
+      notificationContainer.classList.remove('show')
+    }, 8000)
+  }
+  function playNotificationSound () {
+    var notificationSound = document.getElementById('notification-sound')
+    notificationSound.play()
+  }
   function textMessageHandler (message) {
     console.log(message)
     let messageElem = message_template.cloneNode(true)
     message.struct.payload = enc.decode(
       base64ToArrayBuffer(message.struct.payload)
     )
-    
+
     messageElem.querySelector('.message__author').textContent =
       message.struct.sender
     messageElem.querySelector('.message__field').textContent =
