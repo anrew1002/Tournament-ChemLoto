@@ -2,10 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/sessions"
 	"github.com/gorilla/websocket"
@@ -18,7 +16,7 @@ type wsmessage struct {
 
 type textMessage struct {
 	Sender  string `json:"sender"`
-	Payload []byte `json:"payload"`
+	Payload string `json:"payload"`
 }
 type handMessage struct {
 	Sender string `json:"sender"`
@@ -28,38 +26,38 @@ type scoreMessage struct {
 	Score  int    `json:"score"`
 }
 
-func (s *scoreMessage) UnmarshalJSON(data []byte) error {
-	// Define a struct with the same fields as scoreMessage to unmarshal into
-	var temp struct {
-		Target string      `json:"target"`
-		Score  interface{} `json:"score"`
-	}
+// func (s *scoreMessage) UnmarshalJSON(data []byte) error {
+// 	// Define a struct with the same fields as scoreMessage to unmarshal into
+// 	var temp struct {
+// 		Target string      `json:"target"`
+// 		Score  interface{} `json:"score"`
+// 	}
 
-	// Unmarshal into the temporary struct
-	if err := json.Unmarshal(data, &temp); err != nil {
-		return err
-	}
+// 	// Unmarshal into the temporary struct
+// 	if err := json.Unmarshal(data, &temp); err != nil {
+// 		return err
+// 	}
 
-	// Perform additional handling for the Score field
-	switch v := temp.Score.(type) {
-	case float64:
-		s.Score = int(v) // Convert float64 to int if it's a number
-	case string:
-		// Handle string case accordingly, e.g., convert to int or perform validation
-		scoreInt, err := strconv.Atoi(v)
-		if err != nil {
-			return err
-		}
-		s.Score = scoreInt
-	default:
-		return fmt.Errorf("unexpected type for Score: %T", v)
-	}
+// 	// Perform additional handling for the Score field
+// 	switch v := temp.Score.(type) {
+// 	case float64:
+// 		s.Score = int(v) // Convert float64 to int if it's a number
+// 	case string:
+// 		// Handle string case accordingly, e.g., convert to int or perform validation
+// 		scoreInt, err := strconv.Atoi(v)
+// 		if err != nil {
+// 			return err
+// 		}
+// 		s.Score = scoreInt
+// 	default:
+// 		return fmt.Errorf("unexpected type for Score: %T", v)
+// 	}
 
-	// Assign other fields
-	s.Target = temp.Target
+// 	// Assign other fields
+// 	s.Target = temp.Target
 
-	return nil
-}
+// 	return nil
+// }
 
 // NewMessage ...
 func NewMessage(messageType string, strct json.RawMessage) *wsmessage {
@@ -187,17 +185,29 @@ func (clnt *wsclient) readerBuffer(app *App) {
 
 			// for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
 			// 	ws.channel <- msg
-			log.Print("error unmarshaling wsmessage", string(p))
+			log.Print("error unmarshaling wsmessage", string(p), err)
+			continue
 		}
 
 		switch wsmsg.Type {
 		case "chat_text":
-			//msg := textMessage{Sender: clnt.name, Payload: p}
+			// msg := textMessage{Sender: clnt.name, Payload: p}
 
 			// log.Print("printed: ", string(msg.Struct.(textMessage).Payload))
-
+			// var wsmsg_struct textMessage
+			var wsmsg_struct string
+			err := json.Unmarshal(wsmsg.Struct, &wsmsg_struct)
+			if err != nil {
+				log.Println("chat_text: error type assert")
+				continue
+			}
+			json_struct, err := json.Marshal(textMessage{Sender: clnt.name, Payload: wsmsg_struct})
+			if err != nil {
+				log.Print("failed Marshaled")
+			}
+			log.Println(json_struct)
 			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
-				ws.channel <- &wsmsg
+				ws.channel <- &wsmessage{Type: "chat_text", Struct: json_struct}
 			}
 
 		case "score_up":

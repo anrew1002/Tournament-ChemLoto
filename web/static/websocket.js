@@ -32,19 +32,20 @@ document.addEventListener('DOMContentLoaded', e => {
 
     return socket
   }
-  document.forms['publish'].onsubmit = function () {
+  document.forms['publish'].onsubmit = function (e) {
     e.preventDefault()
     // console.log(this.message.value)
-    // const chat_message = {
-    //   type: 'chat_text',
-    //   struct: JSON.stringify(this.message.value)
-    // }
-    // // let outgoingMessage = this.message.value
-    // this.message.value = ''
-    // if (outgoingMessage != '') {
-    //   // console.log(outgoingMessage)
-    //   socket.send(chat_message)
-    // }
+    const chat_message = {
+      type: 'chat_text',
+      // struct: JSON.stringify(this.message.value)
+      struct: this.message.value
+    }
+    let outgoingMessage = this.message.value
+    this.message.value = ''
+    if (outgoingMessage != '') {
+      console.log(chat_message)
+      socket.send(JSON.stringify(chat_message))
+    }
     // return false
   }
 
@@ -94,9 +95,9 @@ document.addEventListener('DOMContentLoaded', e => {
   function textMessageHandler (message) {
     console.log(message)
     let messageElem = message_template.cloneNode(true)
-    message.struct.payload = enc.decode(
-      base64ToArrayBuffer(message.struct.payload)
-    )
+    // message.struct.payload = enc.decode(
+    //   base64ToArrayBuffer(message.struct.payload)
+    // )
 
     messageElem.querySelector('.message__author').textContent =
       message.struct.sender

@@ -239,7 +239,7 @@ function raiseHand () {
 function getElement () {
   // Создаем объект сообщения
   const message = {
-    type: 'getElement'
+    type: 'get_element'
   }
 
   // Отправляем сообщение на сервер
