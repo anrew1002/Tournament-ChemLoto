@@ -99,7 +99,19 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 			}
 			return
 		}
-
+		data.Elements = map[string]int{
+			"H":    52,
+			"C":    40,
+			"CH":   24,
+			"CH2":  24,
+			"CH3":  28,
+			"O":    28,
+			"CL":   16,
+			"N":    16,
+			"C6H4": 16,
+			"chop": 4,
+			// "C6H4": 16,
+		}
 		app.clientManager.addRoom(*data)
 		// http.Redirect(w, r, "/room_list", http.StatusSeeOther)
 		app.writeJSON(w, http.StatusCreated, envelope{"errors": nil, "success": true}, nil)

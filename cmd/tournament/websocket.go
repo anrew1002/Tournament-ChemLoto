@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"math/rand"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -24,6 +25,9 @@ type handMessage struct {
 type scoreMessage struct {
 	Target string `json:"target"`
 	Score  int    `json:"score"`
+}
+type sendElement struct {
+	Element string `json:"element"`
 }
 
 // func (s *scoreMessage) UnmarshalJSON(data []byte) error {
@@ -231,6 +235,32 @@ func (clnt *wsclient) readerBuffer(app *App) {
 			log.Println(wsmsg)
 			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
 				ws.channel <- &wsmsg
+			}
+		case "get_element":
+			elems := app.clientManager.rooms[clnt.room].Elements
+			keys := make([]string, len(elems))
+
+			i := 0
+			for k := range elems {
+				keys[i] = k
+				i++
+			}
+			log.Println(len(elems))
+			rand_index := rand.Intn(len(elems))
+			item, ok := elems[keys[rand_index]]
+			if !ok {
+				log.Println("something went wrong when pick an element")
+			}
+			// if item == 0 {
+
+			// }
+			elems[keys[rand_index]] = item - 1
+			json_struct, err := json.Marshal(sendElement{Element: keys[rand_index]})
+			if err != nil {
+				log.Print("failed Marshaled")
+			}
+			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
+				ws.channel <- &wsmessage{Type: "send_element", Struct: json_struct}
 			}
 
 		default:

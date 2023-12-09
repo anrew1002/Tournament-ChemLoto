@@ -12,4 +12,5 @@ type Room struct {
 	Name       string
 	Time       int
 	Max_partic int
+	Elements   map[string]int
 }

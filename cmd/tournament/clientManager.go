@@ -24,6 +24,19 @@ func newClientManager(store sqlite.Storage) *clientManager {
 	clntMngr.rooms = make(map[string]*Room)
 	for _, room := range store.GetRooms() {
 		log.Println(room)
+		room.Elements = map[string]int{
+			"H":    52,
+			"C":    40,
+			"CH":   24,
+			"CH2":  24,
+			"CH3":  28,
+			"O":    28,
+			"CL":   16,
+			"N":    16,
+			"C6H4": 16,
+			"chop": 4,
+			// "C6H4": 16,
+		}
 		// clntMngr.rooms[room.Name].Max_partic = room.Max_partic
 		// clntMngr.rooms[room.Name].Time = room.Time
 		// clntMngr.rooms[room.Name].wsconnections = make(map[string]*wsclient)
@@ -54,7 +67,7 @@ func (clntMngr *clientManager) addRoom(room models.Room) {
 	clntMngr.Lock()
 	defer clntMngr.Unlock()
 
-	clntMngr.rooms[room.Name] = &Room{wsconnections: make(map[string]*wsclient)}
+	clntMngr.rooms[room.Name] = &Room{wsconnections: make(map[string]*wsclient), Room: room}
 }
 
 func (clntMngr *clientManager) removeRoom(room string) {
