@@ -242,24 +242,15 @@ function getElement () {
   const message = {
     type: 'get_element'
   }
-
   // Отправляем сообщение на сервер
   socket.send(JSON.stringify(message))
 }
 function startGame() {
   // Ваш код для начала игры
-
-  // Покажите кнопку "Вытащить новый элемент"
-  var getElementButton = document.querySelector('.admin-btn');
-  if (getElementButton) {
-      getElementButton.style.display = 'block';
+  const message = {
+    type: 'start_game'
   }
+  // Отправляем сообщение на сервер
+  socket.send(JSON.stringify(message))
 
-  // Скрыть кнопку "Начать игру"
-  var startGameButton = document.querySelector('.start-game-btn');
-  if (startGameButton) {
-      startGameButton.style.display = 'none';
-  }
-
-  // Другие действия, если необходимо
 }
