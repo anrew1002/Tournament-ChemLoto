@@ -46,8 +46,8 @@ header {
     width: 100%;
 }
 
-.room-title {
-    text-align: center;
+#room-title {
+    text-align: left;
     margin: 0;
     /* Убираем отступы */
     flex-grow: 1;
@@ -546,7 +546,7 @@ main {
         /* Уменьшите отступы кнопки */
     }
 
-    .room-title {
+    #room-title {
         padding-left: 130px;
         font-size: 20px;
 
@@ -603,7 +603,7 @@ main {
             height: 50px;
         }
 
-        .room-title {
+        #room-title {
             flex-grow: 0;
             padding-right: 20px;
         }
@@ -626,7 +626,7 @@ main {
     }
 
     @media only screen and (max-width: 407px) {
-        .room-title {
+        #room-title {
             font-size: 15px;
             padding-left: 0;
         }
@@ -665,4 +665,5 @@ main {
             padding-bottom: 0;
         }
     }
+    
 }

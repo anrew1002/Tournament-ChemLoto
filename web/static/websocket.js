@@ -49,25 +49,67 @@ document.addEventListener('DOMContentLoaded', e => {
     // return false
   }
 
-  async function messageHandler (data) {
-    // if (!accounts_map.has(data.author_id)) {
-    //   accounts_map = await fetchUsers(accounts_map)
-    //   console.log('new account data', accounts_map)
-    // }
+  async function messageHandler(data) {
     switch (data.type) {
       case 'chat_text':
-        textMessageHandler(data)
-        break
+        textMessageHandler(data);
+        break;
       case 'raiseHand':
-        console.log(data)
-        raiseHandNotification(data.struct.sender) // Передаем имя пользователя
-
-        break
+        raiseHandNotification(data.struct.sender);
+        break;
+      case 'send_element':
+        handleElementResponse(data.struct.element);
+        break;
       default:
-        console.log('Undefined message type from server')
-        break
+        console.log('Undefined message type from server');
+        break;
     }
   }
+  
+  let currentElementIndex = 5; // Variable to store the index of the current element, starting from the last cell
+  let currentElement = ''; // Variable to store the current element
+  
+  // Assume this function is called when you receive the element data
+  function handleElementResponse(element) {
+    const elementImage = document.getElementById('elementImage');
+    
+    // Show the last-elements container if it's not already visible
+    const lastElementsContainer = document.getElementById('lastElementsContainer');
+    if (lastElementsContainer.style.display === 'none') {
+      lastElementsContainer.style.display = 'block';
+    }
+    
+    // Update the elementImage source based on the received element
+    elementImage.src = `../items/${element}.svg`;
+    
+    // Store the current element
+    currentElement = element;
+  
+    // Update the last element images dynamically
+    updateLastElementImages();
+  }
+  
+  function updateLastElementImages() {
+    for (let i = 5; i > 1; i--) {
+      const currentElementImage = document.getElementById(`element${i}`);
+      const previousElementImage = document.getElementById(`element${i - 1}`);
+      currentElementImage.src = previousElementImage.src;
+    }
+  
+    // Check if the first element matches the current element or is empty
+    const firstElementImage = document.getElementById('element1');
+    if (firstElementImage.src !== `../items/${currentElement}.svg` && currentElement !== '') {
+      firstElementImage.src = `../items/${currentElement}.svg`;
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
   function raiseHandNotification (username) {
     const notificationContainer = document.getElementById(
       'notification-container'
