@@ -180,6 +180,9 @@ func (app *App) UserHandler() http.HandlerFunc {
 				// 	log.Println("Fail to type assertion")
 				// }
 				scoreValue, err := strconv.Atoi(score)
+				if err != nil {
+					log.Println("Failed to atoi", err, score)
+				}
 				err = app.database.UpdateUserScore(roomID, scoreValue)
 				if err != nil {
 					log.Println("user score update:", err)
