@@ -232,6 +232,7 @@ function raiseHand () {
     type: 'raise_hand'
   }
 
+
   // Отправляем сообщение на сервер
   socket.send(JSON.stringify(message))
 }
@@ -241,7 +242,15 @@ function getElement () {
   const message = {
     type: 'get_element'
   }
-
   // Отправляем сообщение на сервер
   socket.send(JSON.stringify(message))
+}
+function startGame() {
+  // Ваш код для начала игры
+  const message = {
+    type: 'start_game'
+  }
+  // Отправляем сообщение на сервер
+  socket.send(JSON.stringify(message))
+
 }

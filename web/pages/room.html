@@ -33,9 +33,12 @@
             <div class="timer">00:20</div>
             <img id="elementImage" src="/items/chem_el.png" alt="Химический элемент">
             {{if not .Admin}} <button class="raise-hand-btn" onclick="raiseHand()">Поднять руку</button> {{end}}
+        
+            {{if .Admin}}<button class="admin-btn" onclick="getElement()" style="display: none;">Вытащить новый элемент</button>{{end}}
+            {{if .Admin}}<button class="admin-btn start-game-btn" onclick="startGame()">Начать игру</button>{{end}}
 
-            {{if .Admin}}<button class="admin-btn" onclick="getElement()">Вытащить новый элемент</button>{{end}}
         </div>
+        
 
         <div class="chat">
             <h2>Чат</h2>

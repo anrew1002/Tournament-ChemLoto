@@ -51,21 +51,52 @@ document.addEventListener('DOMContentLoaded', e => {
 
   async function messageHandler(data) {
     switch (data.type) {
-      case 'chat_text':
-        textMessageHandler(data);
-        break;
-      case 'raiseHand':
-        raiseHandNotification(data.struct.sender);
-        break;
-      case 'send_element':
-        handleElementResponse(data.struct.element);
-        break;
-      default:
-        console.log('Undefined message type from server');
-        break;
+        case 'chat_text':
+            textMessageHandler(data);
+            break;
+        case 'raiseHand':
+            raiseHandNotification(data.struct.sender);
+            break;
+        case 'send_element':
+            handleElementResponse(data.struct.element);
+            break;
+        case 'start_game':
+            startGameHandler();
+            break;
+        default:
+            console.log('Undefined message type from server');
+            break;
     }
-  }
+}
+
+function startGameHandler() {
+  console.log('startGameHandler called');
   
+  // Покажите кнопку "Вытащить новый элемент"
+  var getElementButton = document.querySelector('.admin-btn[onclick="getElement()"]');
+  if (getElementButton) {
+      console.log('Showing getElementButton');
+      getElementButton.style.display = 'block';
+  } else {
+      console.log('getElementButton not found');
+  }
+
+  // Скрыть кнопку "Начать игру"
+  var startGameButton = document.querySelector('.admin-btn.start-game-btn');
+  if (startGameButton) {
+      console.log('Hiding startGameButton');
+      startGameButton.style.display = 'none';
+  } else {
+      console.log('startGameButton not found');
+  }
+
+  // Другие действия, если необходимо
+}
+
+
+
+
+
   let currentElementIndex = 5; // Variable to store the index of the current element, starting from the last cell
   let currentElement = ''; // Variable to store the current element
   
