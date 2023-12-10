@@ -71,7 +71,6 @@ func (clntMngr *clientManager) addRoom(room models.Room) {
 	defer clntMngr.Unlock()
 
 	clntMngr.rooms[room.Name] = &Room{wsconnections: make(map[string]*wsclient), Room: room}
-	go clntMngr.rooms[room.Name].startTicker()
 }
 
 func (clntMngr *clientManager) removeRoom(room string) {
@@ -124,6 +123,7 @@ func (room Room) startTicker() {
 		elem, ok := room.getRandomElement()
 		if !ok {
 			elem = "Empty bag!"
+			return
 		}
 		json_struct, err := json.Marshal(sendElement{Element: elem})
 		if err != nil {

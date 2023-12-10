@@ -28,6 +28,9 @@ type scoreMessage struct {
 type sendElement struct {
 	Element string `json:"element"`
 }
+type startGame struct {
+	Time int `json:"Time"`
+}
 
 // NewMessage ...
 func NewMessage(messageType string, strct json.RawMessage) *wsmessage {
@@ -175,6 +178,16 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				ws.channel <- &wsmessage{Type: "send_element", Struct: json_struct}
 			}
 
+		case "start_game":
+			go app.clientManager.rooms[clnt.room].startTicker()
+			log.Printf("Game %s start!", app.clientManager.rooms[clnt.room].Name)
+			json_struct, err := json.Marshal(startGame{Time: app.clientManager.rooms[clnt.room].Time})
+			if err != nil {
+				log.Print("failed Marshaled")
+			}
+			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
+				ws.channel <- &wsmessage{Type: "start_game", Struct: json_struct}
+			}
 		default:
 			log.Println("websocket get undefined message type: ", wsmsg.Type)
 
