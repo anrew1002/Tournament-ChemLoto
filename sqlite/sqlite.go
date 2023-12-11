@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"log"
 
@@ -28,7 +29,7 @@ func NewStorage() Storage {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS rooms(name TEXT PRIMARY KEY,time INTEGER,max_partic INTEGER DEFAULT 0)`)
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS rooms(name TEXT PRIMARY KEY,time INTEGER,max_partic INTEGER DEFAULT 0, elements TEXT)`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,21 +37,31 @@ func NewStorage() Storage {
 	return Storage{db}
 }
 func (s Storage) CreateRoom(room models.Room) error {
-	_, err := s.Exec(`insert into rooms (name, time, max_partic) values ($1,$2, $3)`, room.Name, room.Time, room.Max_partic)
+	Elem_string, err := json.Marshal(room.Elements)
+	if err != nil {
+		log.Println("CreateRoom: failed to Marshal ", err)
+	}
+	_, err = s.Exec(`insert into rooms (name, time, max_partic, elements) values ($1,$2, $3,$4)`, room.Name, room.Time, room.Max_partic, Elem_string)
 
 	return wrapDBError(err)
 
 }
 func (s Storage) GetRoom(room_id string) (models.Room, error) {
 	result := s.QueryRow("SELECT * FROM rooms WHERE name = $1 ", room_id)
+	var Elem_string string
 
 	// defer result.Close()
 	room := models.Room{}
-	err := result.Scan(&room.Name, &room.Time, &room.Max_partic)
+	err := result.Scan(&room.Name, &room.Time, &room.Max_partic, &Elem_string)
 	if err != nil {
 		// log.Println(err)
 		return room, err
 	}
+	var elem_map map[string]int
+	if err := json.Unmarshal([]byte(Elem_string), &elem_map); err != nil {
+		log.Println("GetRoom: failed to unmarshal ", err)
+	}
+	room.Elements = elem_map
 
 	return room, nil
 }
@@ -65,11 +76,18 @@ func (s Storage) GetRooms() []models.Room {
 
 	for result.Next() {
 		r := models.Room{}
-		err := result.Scan(&r.Name, &r.Time, &r.Max_partic)
+		var Elem_string string
+		err := result.Scan(&r.Name, &r.Time, &r.Max_partic, &Elem_string)
 		if err != nil {
 			log.Println(err)
 			continue
 		}
+		var elem_map map[string]int
+		if err := json.Unmarshal([]byte(Elem_string), &elem_map); err != nil {
+			log.Println("GetRooms: failed to unmarshal ", err)
+			continue
+		}
+		r.Elements = elem_map
 		rooms = append(rooms, r)
 	}
 	return rooms

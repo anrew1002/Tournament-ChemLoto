@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"log"
-	"math/rand"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -14,7 +13,6 @@ type wsmessage struct {
 	Type   string          `json:"type"`
 	Struct json.RawMessage `json:"struct"`
 }
-
 type textMessage struct {
 	Sender  string `json:"sender"`
 	Payload string `json:"payload"`
@@ -29,39 +27,9 @@ type scoreMessage struct {
 type sendElement struct {
 	Element string `json:"element"`
 }
-
-// func (s *scoreMessage) UnmarshalJSON(data []byte) error {
-// 	// Define a struct with the same fields as scoreMessage to unmarshal into
-// 	var temp struct {
-// 		Target string      `json:"target"`
-// 		Score  interface{} `json:"score"`
-// 	}
-
-// 	// Unmarshal into the temporary struct
-// 	if err := json.Unmarshal(data, &temp); err != nil {
-// 		return err
-// 	}
-
-// 	// Perform additional handling for the Score field
-// 	switch v := temp.Score.(type) {
-// 	case float64:
-// 		s.Score = int(v) // Convert float64 to int if it's a number
-// 	case string:
-// 		// Handle string case accordingly, e.g., convert to int or perform validation
-// 		scoreInt, err := strconv.Atoi(v)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		s.Score = scoreInt
-// 	default:
-// 		return fmt.Errorf("unexpected type for Score: %T", v)
-// 	}
-
-// 	// Assign other fields
-// 	s.Target = temp.Target
-
-// 	return nil
-// }
+type startGame struct {
+	Time int `json:"Time"`
+}
 
 // NewMessage ...
 func NewMessage(messageType string, strct json.RawMessage) *wsmessage {
@@ -84,36 +52,11 @@ func newClient(ws *websocket.Conn, name string, room string, admin bool) *wsclie
 	return &wsclient{ws: ws, name: name, channel: make(chan *wsmessage), room: room, admin: admin}
 }
 
-// type clientManager struct {
-// 	wsconnections map[string]*wsclient
-// 	sync.RWMutex
-// }
-
-// func (connM *clientManager) addClient(id string, conn *wsclient) {
-// 	connM.Lock()
-// 	defer connM.Unlock()
-// 	conn.manager = connM
-// 	connM.wsconnections[id] = conn
-// }
-
 var webocketUpgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin:     func(r *http.Request) bool { return true }, // allow all conn by default
 }
-
-// var clientMngr clientManager = clientManager{wsconnections: make(map[string]*wsclient, 100)}
-
-// func (connM *clientManager) removeClient(conn *wsclient) {
-// 	connM.Lock()
-// 	defer connM.Unlock()
-
-// 	if _, ok := connM.wsconnections[conn.name]; ok {
-// 		delete(connM.wsconnections, conn.name)
-// 		conn.ws.Close()
-// 	}
-
-// }
 
 // MessagingHandler handles offering to Upgrade Websocket connection
 func (app *App) MessagingHandler() http.HandlerFunc {
@@ -151,15 +94,7 @@ func (app *App) MessagingHandler() http.HandlerFunc {
 		// through on our WebSocket connection
 		go conn.readerBuffer(app)
 		go conn.writeBuffer()
-		// //resend old messages to new connection
-		// all_msg, err := env.DB.Messages.AllMessages()
-		// if err != nil {
-		// 	log.Println(err)
-		// }
-		// log.Println(all_msg)
-		// for _, p := range all_msg {
-		// 	conn.channel <- p
-		// }
+
 	}
 }
 
@@ -178,17 +113,6 @@ func (clnt *wsclient) readerBuffer(app *App) {
 		}
 		var wsmsg wsmessage
 		if err := json.Unmarshal([]byte(p), &wsmsg); err != nil {
-			// // TODO: add validation
-
-			// msg, err := json.Marshal(textMessage{Sender: clnt.name, Payload: p})
-			// if err != nil {
-			// 	log.Println("failed json marshal chat_text")
-			// }
-
-			// // log.Print("printed: ", string(msg.Struct.(textMessage).Payload))
-
-			// for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
-			// 	ws.channel <- msg
 			log.Print("error unmarshaling wsmessage", string(p), err)
 			continue
 		}
@@ -207,7 +131,7 @@ func (clnt *wsclient) readerBuffer(app *App) {
 			}
 			json_struct, err := json.Marshal(textMessage{Sender: clnt.name, Payload: wsmsg_struct})
 			if err != nil {
-				log.Print("failed Marshaled")
+				log.Print("failed to Marshal")
 			}
 			log.Println(json_struct)
 			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
@@ -217,7 +141,7 @@ func (clnt *wsclient) readerBuffer(app *App) {
 		case "score_up":
 			if clnt.admin {
 				// msg := NewMessage("score_up", scoreMessage{Target: wsmsg.S, Payload: p})
-				log.Println("score up!", wsmsg)
+				// log.Println("score up!", wsmsg)
 				var wsmsg_struct scoreMessage
 				err := json.Unmarshal(wsmsg.Struct, &wsmsg_struct)
 				if err != nil {
@@ -231,31 +155,21 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				log.Println("successfuly update user score ", wsmsg_struct)
 			}
 		case "raise_hand":
-			// msg := handMessage{Sender: clnt.name}
-			log.Println(wsmsg)
+			msg := handMessage{Sender: clnt.name}
+			json_struct, err := json.Marshal(msg)
+			if err != nil {
+				log.Print("failed Marshaled")
+			}
+			log.Println(json_struct)
 			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
-				ws.channel <- &wsmsg
+				ws.channel <- &wsmessage{Type: "raise_hand", Struct: json_struct}
 			}
 		case "get_element":
-			elems := app.clientManager.rooms[clnt.room].Elements
-			keys := make([]string, len(elems))
-
-			i := 0
-			for k := range elems {
-				keys[i] = k
-				i++
-			}
-			log.Println(len(elems))
-			rand_index := rand.Intn(len(elems))
-			item, ok := elems[keys[rand_index]]
+			elem, ok := app.clientManager.rooms[clnt.room].getRandomElement()
 			if !ok {
-				log.Println("something went wrong when pick an element")
+				elem = "Empty bag!"
 			}
-			// if item == 0 {
-
-			// }
-			elems[keys[rand_index]] = item - 1
-			json_struct, err := json.Marshal(sendElement{Element: keys[rand_index]})
+			json_struct, err := json.Marshal(sendElement{Element: elem})
 			if err != nil {
 				log.Print("failed Marshaled")
 			}
@@ -263,6 +177,20 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				ws.channel <- &wsmessage{Type: "send_element", Struct: json_struct}
 			}
 
+		case "start_game":
+			if clnt.admin {
+				if app.clientManager.rooms[clnt.room].Time != 0 {
+					go app.clientManager.rooms[clnt.room].startTicker()
+				}
+				log.Printf("Game %s start!", app.clientManager.rooms[clnt.room].Name)
+				json_struct, err := json.Marshal(startGame{Time: app.clientManager.rooms[clnt.room].Time})
+				if err != nil {
+					log.Print("failed Marshaled")
+				}
+				for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
+					ws.channel <- &wsmessage{Type: "start_game", Struct: json_struct}
+				}
+			}
 		default:
 			log.Println("websocket get undefined message type: ", wsmsg.Type)
 

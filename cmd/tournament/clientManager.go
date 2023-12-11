@@ -1,8 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
+	"math/rand"
 	"sync"
+	"time"
 
 	"github.com/anrew1002/Tournament-ChemLoto/models"
 	"github.com/anrew1002/Tournament-ChemLoto/sqlite"
@@ -24,19 +27,6 @@ func newClientManager(store sqlite.Storage) *clientManager {
 	clntMngr.rooms = make(map[string]*Room)
 	for _, room := range store.GetRooms() {
 		log.Println(room)
-		room.Elements = map[string]int{
-			"H":    52,
-			"C":    40,
-			"CH":   24,
-			"CH2":  24,
-			"CH3":  28,
-			"O":    28,
-			"CL":   16,
-			"N":    16,
-			"C6H4": 16,
-			"chop": 4,
-			// "C6H4": 16,
-		}
 		// clntMngr.rooms[room.Name].Max_partic = room.Max_partic
 		// clntMngr.rooms[room.Name].Time = room.Time
 		// clntMngr.rooms[room.Name].wsconnections = make(map[string]*wsclient)
@@ -78,5 +68,57 @@ func (clntMngr *clientManager) removeRoom(room string) {
 			clntMngr.removeClient(wscnct, room)
 		}
 		delete(clntMngr.rooms, room)
+	}
+}
+
+func (room Room) getRandomElement() (string, bool) {
+
+	elems := room.Elements
+	keys := make([]string, len(elems), 12)
+	// empty_el := make([]string, 12)
+	i := 0
+	for k := range elems {
+		keys[i] = k
+		i++
+	}
+	// log.Println(len(elems))
+
+	for {
+		rand_index := rand.Intn(len(keys))
+		item, ok := elems[keys[rand_index]]
+		if !ok {
+			log.Println("something went wrong when pick an element")
+		}
+		if item == 0 {
+			keys[rand_index] = keys[len(keys)-1]
+			keys = keys[:len(keys)-1]
+		} else {
+			elems[keys[rand_index]] = item - 1
+			return keys[rand_index], true
+		}
+		if len(keys) == 0 {
+			return "nil", false
+		}
+	}
+
+}
+
+func (room Room) startTicker() {
+	ticker := time.NewTicker(time.Duration(room.Time) * time.Second)
+	log.Println("Ticker set!")
+	for range ticker.C {
+		elem, ok := room.getRandomElement()
+		if !ok {
+			elem = "Empty bag!"
+			return
+		}
+		json_struct, err := json.Marshal(sendElement{Element: elem})
+		if err != nil {
+			log.Print("failed Marshaled")
+		}
+		log.Println(elem)
+		for _, ws := range room.wsconnections {
+			ws.channel <- &wsmessage{Type: "send_element", Struct: json_struct}
+		}
 	}
 }
