@@ -84,21 +84,6 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 			max_partic = 0
 		}
 		data.Max_partic = max_partic
-		log.Println(data)
-		err = app.database.CreateRoom(*data)
-		fmt.Printf("err: %T\n", err)
-		log.Print(err)
-		if err != nil {
-			if errors.Is(err, sqlite.ErrDup) {
-				// log.Print(err)
-				formErrors["ErrRoomName"] = "Такая комната уже существует!"
-				err = app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": formErrors, "success": false}, nil)
-				if err != nil {
-					log.Println(err)
-				}
-			}
-			return
-		}
 		data.Elements = map[string]int{
 			"H":    52,
 			"C":    40,
@@ -111,6 +96,21 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 			"C6H4": 16,
 			"chop": 4,
 			// "C6H4": 16,
+		}
+		log.Println(data)
+		err = app.database.CreateRoom(*data)
+		// fmt.Printf("err: %T\n", err)
+		// log.Print(err)
+		if err != nil {
+			if errors.Is(err, sqlite.ErrDup) {
+				// log.Print(err)
+				formErrors["ErrRoomName"] = "Такая комната уже существует!"
+				err = app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": formErrors, "success": false}, nil)
+				if err != nil {
+					log.Println(err)
+				}
+			}
+			return
 		}
 		app.clientManager.addRoom(*data)
 		// http.Redirect(w, r, "/room_list", http.StatusSeeOther)

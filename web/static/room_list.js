@@ -85,7 +85,7 @@ function addRoomToTable(id, name, isAuto, time, maxPlayers, organizer) {
     // Create a hyperlink element
     var roomLink = document.createElement('a');
     roomLink.textContent = name;
-    roomLink.href = '/rooms/' + name; // Set the href attribute to the room URL
+    roomLink.href = '/rooms/' + encodeURI(name); // Set the href attribute to the room URL
     cell1.appendChild(roomLink);
 
     cell2.innerHTML = (isAuto ? 'Да' : 'Нет');
@@ -132,7 +132,7 @@ function updateRoomList() {
                 // Create a hyperlink element
                 var roomLink = document.createElement('a');
                 roomLink.textContent = room.Name;
-                roomLink.href = '/rooms/' + room.Name; // Set the href attribute to the room URL
+                roomLink.href = '/rooms/' + encodeURI(room.Name); // Set the href attribute to the room URL
                 cell1.appendChild(roomLink);
 
                 cell2.innerHTML = (room.Time > 0 ? 'Да' : 'Нет');
