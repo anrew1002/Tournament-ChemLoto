@@ -97,8 +97,11 @@
                 onclick="handleCheckboxClick(this)">
             <label for="radio-penalty" style="font-size: 24px; font-weight: 300;">Штрафное очко</label>
         </div>
+        
         <div class="manual-input">
-            <label for="manualScore">Введите очки вручную:</label>
+            <div class="bar"></div> 
+            <label for="manualScore"><strong>Или</strong> введите очки вручную:</label>
+            
             <input type="number" id="manualScore" name="manualScore">
         </div>
         <button type="button" id="modalButton">Начислить очки</button>

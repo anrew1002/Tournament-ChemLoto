@@ -17,7 +17,17 @@
     font-size: 36px;
     color: #333;
 }
+.manual-input {
+    position: relative;
+}
 
+.bar {
+
+    width: 100%;
+    height: 3px; /* Adjust the height of the bar as needed */
+    background-color: #cdcbcb; /* Adjust the background color as needed */
+    margin-bottom: 10px;
+}
 body {
     margin: 0;
     padding: 0;

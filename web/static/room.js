@@ -128,24 +128,76 @@ document.addEventListener('DOMContentLoaded', function () {
   function sendScores () {
     // Получите значения из полей формы
     const alphaScore = getSelectedScore(document.getElementById('alphaBlock'))
-
     const betaScore = getSelectedScore(document.getElementById('betaBlock'))
     const gammaScore = getSelectedScore(document.getElementById('gammaBlock'))
-    console.log('pushed score', alphaScore)
+    const penaltyScore = getSelectedScore(document.getElementById('penaltyBlock'))
+    const manualScore = document.getElementById('manualScore').value || 0; // Default to 0 if nothing is entered manually
 
     // Замените 'selectedUsername' на актуальное значение имени пользователя
-    const encodedUsername = encodeURIComponent(selectedUsername)
-    // Создаем объект сообщения
-    const message = {
-      type: 'score_up',
-      struct: {
-        target: selectedUsername,
-        score: parseInt(alphaScore)
-      }
+    const encodedUsername = encodeURIComponent(selectedUsername);
+
+    // Создаем объект сообщения для каждого типа score
+    const messages = [];
+
+    if (alphaScore !== 0) {
+        messages.push({
+            type: 'score_up',
+            struct: {
+                field: "alpha",
+                target: selectedUsername,
+                score: parseInt(alphaScore)
+            }
+        });
     }
 
-    // Отправляем сообщение на сервер
-    socket.send(JSON.stringify(message))
+    if (betaScore !== 0) {
+        messages.push({
+            type: 'score_up',
+            struct: {
+                field: "beta",
+                target: selectedUsername,
+                score: parseInt(betaScore)
+            }
+        });
+    }
+
+    if (gammaScore !== 0) {
+        messages.push({
+            type: 'score_up',
+            struct: {
+                field: "gamma",
+                target: selectedUsername,
+                score: parseInt(gammaScore)
+            }
+        });
+    }
+
+    if (penaltyScore !== 0) {
+        messages.push({
+            type: 'score_up',
+            struct: {
+                field: "penalty",
+                target: selectedUsername,
+                score: parseInt(penaltyScore)
+            }
+        });
+    }
+
+    if (manualScore !== 0) {
+        messages.push({
+            type: 'score_up',
+            struct: {
+                field: "manual",
+                target: selectedUsername,
+                score: parseInt(manualScore)
+            }
+        });
+    }
+
+    // Отправляем сообщения на сервер
+    messages.forEach(message => {
+        socket.send(JSON.stringify(message));
+    });
 
     // // Отправьте данные на сервер
     // fetch('/api/users/' + encodedUsername, {
