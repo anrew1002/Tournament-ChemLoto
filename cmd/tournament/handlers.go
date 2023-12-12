@@ -85,16 +85,16 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 		}
 		data.Max_partic = max_partic
 		data.Elements = map[string]int{
-			"H":    52,
-			"C":    40,
-			"CH":   24,
-			"CH2":  24,
-			"CH3":  28,
-			"O":    28,
-			"CL":   16,
-			"N":    16,
-			"C6H4": 16,
-			"chop": 4,
+			"H":     52,
+			"C":     40,
+			"CH":    24,
+			"CH2":   24,
+			"CH3":   28,
+			"O":     28,
+			"CL":    16,
+			"N":     16,
+			"C6H4":  16,
+			"TRADE": 4,
 			// "C6H4": 16,
 		}
 		log.Println(data)
