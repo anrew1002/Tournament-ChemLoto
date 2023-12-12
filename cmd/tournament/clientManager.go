@@ -131,5 +131,7 @@ func sendRandomItem(room *Room) {
 	}
 }
 func (room *Room) stopTicker() {
-	room.ticker.Stop()
+	if room.ticker != nil {
+		room.ticker.Stop()
+	}
 }
