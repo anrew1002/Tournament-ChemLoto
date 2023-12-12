@@ -85,16 +85,16 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 		}
 		data.Max_partic = max_partic
 		data.Elements = map[string]int{
-			"H":    52,
-			"C":    40,
-			"CH":   24,
-			"CH2":  24,
-			"CH3":  28,
-			"O":    28,
-			"CL":   16,
-			"N":    16,
-			"C6H4": 16,
-			"chop": 4,
+			"H":     52,
+			"C":     40,
+			"CH":    24,
+			"CH2":   24,
+			"CH3":   28,
+			"O":     28,
+			"CL":    16,
+			"N":     16,
+			"C6H4":  16,
+			"TRADE": 4,
 			// "C6H4": 16,
 		}
 		log.Println(data)
@@ -159,7 +159,11 @@ func (app *App) RoomDeleteHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if roomID := chi.URLParam(r, "room_id"); roomID != "" {
 			log.Println("Удаление комнаты: ", roomID)
-
+			err := app.database.DeleteRoom(roomID)
+			if err != nil {
+				log.Println("Не получилось удалить комнаты", err)
+			}
+			app.clientManager.removeRoom(roomID)
 			app.writeJSON(w, http.StatusOK, envelope{"success": true}, nil)
 		}
 	}

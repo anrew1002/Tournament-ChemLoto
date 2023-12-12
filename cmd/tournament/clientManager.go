@@ -108,7 +108,7 @@ func (room Room) getRandomElement() (string, bool) {
 func (room Room) startTicker() {
 	room.ticker = time.NewTicker(time.Duration(room.Time) * time.Second)
 	log.Println("Ticker set!")
-	room.ticker.Reset(time.Duration(room.Time) * time.Second)
+	// room.ticker.Reset(time.Duration(room.Time) * time.Second)
 	sendRandomItem(room)
 	for range room.ticker.C {
 		sendRandomItem(room)
