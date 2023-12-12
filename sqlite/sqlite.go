@@ -46,6 +46,12 @@ func (s Storage) CreateRoom(room models.Room) error {
 	return wrapDBError(err)
 
 }
+func (s Storage) DeleteRoom(room models.Room) error {
+	_, err := s.Exec(`delete from rooms where name = $1`)
+
+	return wrapDBError(err)
+
+}
 func (s Storage) GetRoom(room_id string) (models.Room, error) {
 	result := s.QueryRow("SELECT * FROM rooms WHERE name = $1 ", room_id)
 	var Elem_string string

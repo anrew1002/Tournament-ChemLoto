@@ -58,7 +58,7 @@ func (clntMngr *clientManager) addRoom(room models.Room) {
 	clntMngr.Lock()
 	defer clntMngr.Unlock()
 
-	clntMngr.rooms[room.Name] = &Room{wsconnections: make(map[string]*wsclient), Room: room, ticker: time.NewTicker(time.Duration(room.Time) * time.Second)}
+	clntMngr.rooms[room.Name] = &Room{wsconnections: make(map[string]*wsclient), Room: room}
 }
 
 func (clntMngr *clientManager) removeRoom(room string) {
@@ -105,11 +105,11 @@ func (room Room) getRandomElement() (string, bool) {
 }
 
 func (room Room) startTicker() {
-	ticker := room.ticker
+	room.ticker = time.NewTicker(time.Duration(room.Time) * time.Second)
 	log.Println("Ticker set!")
-	ticker.Reset(time.Duration(room.Time) * time.Second)
+	room.ticker.Reset(time.Duration(room.Time) * time.Second)
 	sendRandomItem(room)
-	for range ticker.C {
+	for range room.ticker.C {
 		sendRandomItem(room)
 	}
 }

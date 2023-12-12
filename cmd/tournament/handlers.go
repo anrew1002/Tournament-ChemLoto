@@ -158,6 +158,8 @@ func (app *App) RoomHandler() http.HandlerFunc {
 func (app *App) RoomDeleteHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if roomID := chi.URLParam(r, "room_id"); roomID != "" {
+			log.Println("Удаление комнаты: ", roomID)
+
 			app.writeJSON(w, http.StatusOK, envelope{"success": true}, nil)
 		}
 	}
