@@ -24,8 +24,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // Loop through the sorted user data and update the table
         usersInRoom.forEach(user => {
           const listItem = document.createElement('li')
-          listItem.textContent = `${user.Username} - ${user.Score} очков`
+          listItem.textContent = `${user.Admin ? '✪ ' : ''}${user.Username} - ${user.Score} очков`;
 
+          
           // Add a click event listener to each player name
           listItem.addEventListener('click', function () {
             if (isAdmin === 'true') {
@@ -262,7 +263,7 @@ function startGame() {
 
 }
 
-console.log(timer)
+
 function stopGame() {
   // Ваш код для начала игры
   const message = {
@@ -280,7 +281,7 @@ function stopGame() {
 function continueGame() {
   // Ваш код для начала игры
   const message = {
-    type: 'continue_game'
+    type: 'start_game'
   }
   var stopButton = document.getElementById('stopButton');
   stopButton.style.display = 'block';
