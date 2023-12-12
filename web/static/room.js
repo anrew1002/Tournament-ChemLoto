@@ -9,8 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(data => {
         const topPlayersList = document.getElementById('topPlayersList')
         const roomName = document.getElementById('room-title')
-        console.log(data)
-        console.log(isAdmin)
+
         // Clear existing list
         topPlayersList.innerHTML = ''
 
@@ -257,10 +256,37 @@ function startGame() {
   const message = {
     type: 'start_game'
   }
-  var element = document.getElementById('elementImage');
+  
+  // Отправляем сообщение на сервер
+  socket.send(JSON.stringify(message))
 
-  // Изменяем свойство display на 'block'
-  element.style.display = 'block';
+}
+
+console.log(timer)
+function stopGame() {
+  // Ваш код для начала игры
+  const message = {
+    type: 'raise_hand'
+  }
+  var startButton = document.getElementById('continueButton');
+  startButton.style.display = 'block';
+
+  var stopButton = document.getElementById('stopButton');
+  stopButton.style.display = 'none';
+  // Отправляем сообщение на сервер
+  socket.send(JSON.stringify(message))
+
+}
+function continueGame() {
+  // Ваш код для начала игры
+  const message = {
+    type: 'continue_game'
+  }
+  var stopButton = document.getElementById('stopButton');
+  stopButton.style.display = 'block';
+
+  var startButton = document.getElementById('continueButton');
+  startButton.style.display = 'none';
   // Отправляем сообщение на сервер
   socket.send(JSON.stringify(message))
 

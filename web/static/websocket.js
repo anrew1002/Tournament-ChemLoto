@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', e => {
   let accounts_map = new Map()
   setWebsocket()
 
-  function setWebsocket () {
+  function setWebsocket() {
     socket = new WebSocket('ws://127.0.0.1:80/ws')
     socket.onmessage = function (event) {
       messageHandler(JSON.parse(event.data))
@@ -48,102 +48,150 @@ document.addEventListener('DOMContentLoaded', e => {
     }
     // return false
   }
-
+  var timer = null;
+  var intervalId = null;
+  
   async function messageHandler(data) {
     switch (data.type) {
-        case 'chat_text':
-            textMessageHandler(data);
-            break;
-        case 'raise_hand':
-            raiseHandNotification(data.struct.sender);
-            break;
-        case 'send_element':
-            handleElementResponse(data.struct.element);
-            break;
-        case 'start_game':
-            startGameHandler();
-            // Call timerHandler only when the game starts
+      case 'chat_text':
+        textMessageHandler(data);
+        break;
+      case 'raise_hand':
+        raiseHandNotification(data.struct.sender);
+        break;
+      // case 'stop_game':
+      //   raiseHandNotification(data.struct.sender);
+      //   break;
+      case 'send_element':
+        handleElementResponse(data.struct.element);
+        console.log('s');
+        // Сразу сбрасываем и запускаем таймер
+        if (timer == 0) {
+          var stopButton = document.getElementById('stopButton');
+          stopButton.style.display = 'none';
+        }
+        else {
+          resetAndStartTimer(timer);
+        }
+
+        break;
+      case 'start_game':
+        startGameHandler();
+        if (timer == 0) {
+          var stopButton = document.getElementById('stopButton');
+          stopButton.style.display = 'none';
+        }
+        else {
+          timerHandler(data.struct.Time);
+        }
+        timer = data.struct.Time;
+        break;
+      case 'init_connection':
+        if (data.struct.Started == true) {
+          startGameHandler();
+          if (timer == 0) {
+            var stopButton = document.getElementById('stopButton');
+            stopButton.style.display = 'none';
+          }
+          else {
             timerHandler(data.struct.Time);
-            break;
+          }
 
-        default:
-            console.log('Undefined message type from server ', data.type);
-            break;
+          timer = data.struct.Time;
+        }
+        break;
+      default:
+        console.log('Неизвестный тип сообщения от сервера ', data.type);
+        break;
     }
-}
+  }
 
-function timerHandler(time) {
+  function timerHandler(time) {
+    if (time == 0){
+      return
+    }
     var timerElement = document.querySelector('.timer');
     var imageElement = document.getElementById('elementImage');
     var initialTime = time;
 
     function updateTimer() {
-        timerElement.textContent = formatTime(initialTime);
+      timerElement.textContent = formatTime(initialTime);
 
-        if (initialTime <= 5 && initialTime % 2 === 0) {
-            imageElement.classList.add('flash');
-        } else {
-            imageElement.classList.remove('flash');
-        }
+      if (initialTime <= 5 && initialTime % 2 === 0) {
+        imageElement.classList.add('flash');
+      } else {
+        imageElement.classList.remove('flash');
+      }
 
-        if (initialTime <= 0) {
-            resetTimer();
-        }
+      if (initialTime <= 0) {
+        resetAndStartTimer(time);
+      }
 
-        initialTime--;
-        setTimeout(updateTimer, 1000);
+      initialTime--;
     }
 
     function formatTime(seconds) {
-        var minutes = Math.floor(seconds / 60);
-        var remainingSeconds = seconds % 60;
-
-        var formattedTime = pad(minutes, 2) + ':' + pad(remainingSeconds, 2);
-
-        return formattedTime;
+      var minutes = Math.floor(seconds / 60);
+      var remainingSeconds = seconds % 60;
+      var formattedTime = pad(minutes, 2) + ':' + pad(remainingSeconds, 2);
+      return formattedTime;
     }
 
     function pad(number, length) {
-        var str = String(number);
-        while (str.length < length) {
-            str = '0' + str;
-        }
-        return str;
+      var str = String(number);
+      while (str.length < length) {
+        str = '0' + str;
+      }
+      return str;
+    }
+    updateTimer();
+    // Очищаем предыдущий interval перед установкой нового
+    clearInterval(intervalId);
+    // Устанавливаем новый interval
+    intervalId = setInterval(updateTimer, 1000);
+  }
+
+  function resetAndStartTimer(time) {
+    // Здесь должно быть назначение начального времени, если это необходимо.
+    timer = time;
+    // Сбросить таймер и запустить его заново
+    timerHandler(timer);
+  }
+
+
+
+
+
+  function startGameHandler() {
+    console.log('startGameHandler called');
+    if (timer !== 0) {
+      var stopButton = document.getElementById('stopButton');
+      stopButton.style.display = 'block';
     }
 
-    function resetTimer() {
-        initialTime = time;
-    }
-
-    // Start the timer only if it hasn't been started already
-    if (!timerElement.dataset.timerStarted) {
-        timerElement.dataset.timerStarted = true;
-        updateTimer();
-    }
-}
-function startGameHandler() {
-  console.log('startGameHandler called');
-  
-  // Покажите кнопку "Вытащить новый элемент"
-  var getElementButton = document.querySelector('.admin-btn[onclick="getElement()"]');
-  if (getElementButton) {
+    var element = document.getElementById('elementImage');
+    // Изменяем свойство display на 'block'
+    element.style.display = 'block';
+    // Покажите кнопку "Вытащить новый элемент"
+    var getElementButton = document.querySelector('.admin-btn[onclick="getElement()"]');
+    if (getElementButton) {
       console.log('Showing getElementButton');
       getElementButton.style.display = 'block';
-  } else {
+    } else {
       console.log('getElementButton not found');
-  }
+    }
 
-  // Скрыть кнопку "Начать игру"
-  var startGameButton = document.querySelector('.admin-btn.start-game-btn');
-  if (startGameButton) {
+    // Скрыть кнопку "Начать игру"
+    var startGameButton = document.querySelector('.admin-btn.start-game-btn');
+    if (startGameButton) {
       console.log('Hiding startGameButton');
       startGameButton.style.display = 'none';
-  } else {
+    } else {
       console.log('startGameButton not found');
-  }
+    }
 
-  // Другие действия, если необходимо
-}
+    // Другие действия, если необходимо
+  }
 
 
 
@@ -151,49 +199,49 @@ function startGameHandler() {
 
   let currentElementIndex = 5; // Variable to store the index of the current element, starting from the last cell
   let currentElement = ''; // Variable to store the current element
-  
+
   // Assume this function is called when you receive the element data
   function handleElementResponse(element) {
     const elementImage = document.getElementById('elementImage');
-    
+
     // Show the last-elements container if it's not already visible
     const lastElementsContainer = document.getElementById('lastElementsContainer');
     if (lastElementsContainer.style.display === 'none') {
       lastElementsContainer.style.display = 'block';
     }
-    
+
     // Update the elementImage source based on the received element
     elementImage.src = `../items/${element}.svg`;
-    
+
     // Store the current element
     currentElement = element;
-  
+
     // Update the last element images dynamically
     updateLastElementImages();
   }
-  
+
   function updateLastElementImages() {
     for (let i = 5; i > 1; i--) {
       const currentElementImage = document.getElementById(`element${i}`);
       const previousElementImage = document.getElementById(`element${i - 1}`);
       currentElementImage.src = previousElementImage.src;
     }
-  
+
     // Check if the first element matches the current element or is empty
     const firstElementImage = document.getElementById('element1');
     if (firstElementImage.src !== `../items/${currentElement}.svg` && currentElement !== '') {
       firstElementImage.src = `../items/${currentElement}.svg`;
     }
   }
-  
-  
-  
-  
-  
-  
-  
-  
-  function raiseHandNotification (username) {
+
+
+
+
+
+
+
+
+  function raiseHandNotification(username) {
     const notificationContainer = document.getElementById(
       'notification-container'
     )
@@ -213,11 +261,11 @@ function startGameHandler() {
       notificationContainer.classList.remove('show')
     }, 8000)
   }
-  function playNotificationSound () {
+  function playNotificationSound() {
     var notificationSound = document.getElementById('notification-sound')
     notificationSound.play()
   }
-  function textMessageHandler (message) {
+  function textMessageHandler(message) {
     console.log(message)
     let messageElem = message_template.cloneNode(true)
     // message.struct.payload = enc.decode(
@@ -230,7 +278,7 @@ function startGameHandler() {
       message.struct.payload
     dialod_window.append(messageElem)
   }
-  async function fetchUsers (accounts_map) {
+  async function fetchUsers(accounts_map) {
     try {
       let response = await fetch('/all_users')
       let accounts = await response.json()
@@ -245,7 +293,7 @@ function startGameHandler() {
     }
   }
 
-  function base64ToArrayBuffer (base64) {
+  function base64ToArrayBuffer(base64) {
     var binaryString = atob(base64)
     var bytes = new Uint8Array(binaryString.length)
     for (var i = 0; i < binaryString.length; i++) {

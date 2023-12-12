@@ -164,9 +164,8 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				log.Println("successfuly update user score ", wsmsg_struct)
 			}
 		case "raise_hand":
-			// if room := app.clientManager.rooms[clnt.room].ticker; room != nil {
+
 			app.clientManager.rooms[clnt.room].stopTicker()
-			// }
 
 			log.Printf("Game %s stopped", clnt.room)
 			msg := handMessage{Sender: clnt.name}

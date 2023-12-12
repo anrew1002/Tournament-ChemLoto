@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="../static/websocket.js"></script>
+    <script  src="../static/websocket.js"></script>
     <link rel="stylesheet" href="../static//styles/room.css">
 </head>
 
@@ -35,6 +35,9 @@
             {{if not .Admin}} <button class="raise-hand-btn" onclick="raiseHand()">Поднять руку</button> {{end}}
         
             {{if .Admin}}<button class="admin-btn" onclick="getElement()" style="display: none;">Вытащить новый элемент</button>{{end}}
+            <button id="stopButton" class="admin-btn stop" onclick="stopGame()" style="display: none;">Стоп-игра</button>
+
+            {{if .Admin}}<button id="continueButton" class="admin-btn continue" onclick="continueGame()" style="display: none;">Продолжить игру</button>{{end}}
             {{if .Admin}}<button class="admin-btn start-game-btn" onclick="startGame()">Начать игру</button>{{end}}
 
         </div>
