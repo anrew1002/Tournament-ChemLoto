@@ -1,7 +1,9 @@
 'use strict'
 var socket
+
 document.addEventListener('DOMContentLoaded', e => {
   // get important elements
+  var isAdmin = document.getElementById('isAdmin').textContent
   const dialod_window = document.querySelector('.messages')
   const enc = new TextDecoder('utf-8')
   const status = document.getElementById('status')
@@ -50,7 +52,8 @@ document.addEventListener('DOMContentLoaded', e => {
   }
   var timer = null;
   var intervalId = null;
-  
+  var isTimerPaused = false;
+  let isStopButtonHidden = false;
   async function messageHandler(data) {
     switch (data.type) {
       case 'chat_text':
@@ -59,19 +62,28 @@ document.addEventListener('DOMContentLoaded', e => {
       case 'raise_hand':
         raiseHandNotification(data.struct.sender);
         pauseTimer();
+        if (!isStopButtonHidden && isAdmin ==='true') {
+        var startButton = document.getElementById('continueButton');
+        startButton.style.display = 'block';
+
+        var stopButton = document.getElementById('stopButton');
+        stopButton.style.display = 'none';
+        isStopButtonHidden = true;
+        }
         break;
       case 'send_element':
         handleElementResponse(data.struct.element, data.struct.last_elements);
         // Сразу сбрасываем и запускаем таймер
         if (timer == 0) {
-          console.log('daaaaaaaaa')
+
         } else {
           resetAndStartTimer(timer);
         }
         break;
       case 'start_game':
         startGameHandler();
-        if (timer == 0) {
+        resumeTimer()
+        if (timer == 0 && isAdmin === 'true') {
           var stopButton = document.getElementById('stopButton');
           stopButton.style.display = 'none';
         } else {
@@ -80,17 +92,32 @@ document.addEventListener('DOMContentLoaded', e => {
         timer = data.struct.Time;
         break;
       case 'init_connection':
+        timer = data.struct.Time;
         if (data.struct.Started == true) {
           startGameHandler();
-          if (timer == 0) {
+          console.log(timer)
+          if (timer === 0 && !isStopButtonHidden && isAdmin === 'true') {
             var stopButton = document.getElementById('stopButton');
             stopButton.style.display = 'none';
-          } else {
+            
+            // Устанавливаем флаг в true после первого скрытия
+            isStopButtonHidden = true;
+        } else if (timer !== 0) {
             timerHandler(data.struct.Time);
+        }
+          if (data.struct.Paused === true) {
+            if (isAdmin === 'true'){
+              var startButton = document.getElementById('continueButton');
+            startButton.style.display = 'block';
+
+            var stopButton = document.getElementById('stopButton');
+            stopButton.style.display = 'none';
+            }
+            
+            pauseTimer()
           }
-  
-          timer = data.struct.Time;
-          handleElementResponse(data.struct.last_elements[4], data.struct.last_elements);
+          console.log(data.struct.last_elements)
+          handleElementResponse(data.struct.last_elements[data.struct.last_elements.length - 1], data.struct.last_elements);
         }
         break;
       default:
@@ -100,14 +127,20 @@ document.addEventListener('DOMContentLoaded', e => {
   }
 
   function timerHandler(time) {
-    if (time == 0){
-      return
+    if (time == 0) {
+      return;
     }
+
     var timerElement = document.querySelector('.timer');
     var imageElement = document.getElementById('elementImage');
     var initialTime = time;
 
     function updateTimer() {
+      if (isTimerPaused) {
+        // Если таймер приостановлен, не обновляем его
+        return;
+      }
+
       timerElement.textContent = formatTime(initialTime);
 
       if (initialTime <= 5 && initialTime % 2 === 0) {
@@ -137,6 +170,7 @@ document.addEventListener('DOMContentLoaded', e => {
       }
       return str;
     }
+
     updateTimer();
     // Очищаем предыдущий interval перед установкой нового
     clearInterval(intervalId);
@@ -150,7 +184,12 @@ document.addEventListener('DOMContentLoaded', e => {
     // Сбросить таймер и запустить его заново
     timerHandler(timer);
   }
-
+  function pauseTimer() {
+    isTimerPaused = true;
+  }
+  function resumeTimer() {
+    isTimerPaused = false;
+  }
 
 
 
@@ -158,25 +197,27 @@ document.addEventListener('DOMContentLoaded', e => {
   function startGameHandler() {
     console.log('startGameHandler called');
     var isAdmin = document.getElementById('isAdmin').textContent
-    if (timer !== 0 && isAdmin == true) {
-      
+    if (timer !== 0 && isAdmin == 'true') {
+
       var stopButton = document.getElementById('stopButton');
       stopButton.style.display = 'block';
-      
+
     }
-    
+
     var element = document.getElementById('elementImage');
     // Изменяем свойство display на 'block'
     element.style.display = 'block';
     // Покажите кнопку "Вытащить новый элемент"
-    var getElementButton = document.querySelector('.admin-btn[onclick="getElement()"]');
-    if (getElementButton) {
-      console.log('Showing getElementButton');
-      getElementButton.style.display = 'block';
-    } else {
-      console.log('getElementButton not found');
-    }
+    if (timer === 0) {
 
+      var getElementButton = document.querySelector('.admin-btn[onclick="getElement()"]');
+      if (getElementButton) {
+        console.log('Showing getElementButton');
+        getElementButton.style.display = 'block';
+      } else {
+        console.log('getElementButton not found');
+      }
+    }
     // Скрыть кнопку "Начать игру"
     var startGameButton = document.querySelector('.admin-btn.start-game-btn');
     if (startGameButton) {
@@ -185,7 +226,7 @@ document.addEventListener('DOMContentLoaded', e => {
     } else {
       console.log('startGameButton not found');
     }
-   
+
     // Другие действия, если необходимо
   }
 
@@ -204,10 +245,10 @@ document.addEventListener('DOMContentLoaded', e => {
     if (lastElementsContainer.style.display === 'none') {
       lastElementsContainer.style.display = 'block';
     }
-  
+
     // Update the elementImage source based on the received element
     elementImage.src = `../items/${element}.svg`;
-  
+
     // Update the last element images dynamically
     for (let i = 0; i < lastElements.length; i++) {
       const lastElementImage = document.getElementById(`element${i + 1}`);
@@ -228,9 +269,6 @@ document.addEventListener('DOMContentLoaded', e => {
       firstElementImage.src = `../items/${currentElement}.svg`;
     }
   }
-
-
-
 
 
 

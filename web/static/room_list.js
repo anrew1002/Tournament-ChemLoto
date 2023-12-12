@@ -31,45 +31,57 @@ function createRoom() {
     // Получите данные из формы создания комнаты
     const roomName = document.getElementById('roomName').value;
     const isAuto = document.getElementById('autoPlay').checked;
-    const timeOptions = document.getElementById('timeOptions');  // Moved this line outside the if statement
+    const timeOptions = document.getElementById('timeOptions');
     const time = timeOptions.options[timeOptions.selectedIndex].value;
     const maxPlayers = document.getElementById('maxPlayers').value;
+
+    // Получите данные о количестве элементов
+    const elementCounts = {};
+    const chemicalElements = document.querySelectorAll('.chemical-element');
+    chemicalElements.forEach(element => {
+        const elementId = element.querySelector('.element-img').alt;
+        const elementCountInput = element.querySelector('input[type="number"]');
+        const elementCount = parseInt(elementCountInput.value, 10);
+        elementCounts[elementId] = elementCount;
+    });
 
     // Отправить данные на сервер для создания комнаты
     fetch('/api/rooms/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json', // Изменено на application/json
         },
-        body: new URLSearchParams({
+        body: JSON.stringify({
             roomName: roomName,
             isAuto: isAuto,
             time: time,
             maxPlayers: maxPlayers,
-            createRoom: '1', // параметр для различия запроса на создание комнаты
+            createRoom: '1',
+            elementCounts: elementCounts,
         }),
     })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            if (data.success) {
-                // Успешно создано, добавьте комнату к таблице без перезагрузки
-                addRoomToTable(data.roomId, roomName, isAuto, time, maxPlayers);
-                const err = document.getElementById('error');
-                err.innerHTML = "";
-                hideCreateRoomForm(); // Скрыть модальное окно
-            } else {
-                const err = document.getElementById('error');
-                err.innerHTML = "";
-                console.log("error", data.errors);
-                for (let KeyErr in data.errors) {
-                    err.innerHTML += data.errors[KeyErr] + '<br>';
-                    console.log(KeyErr);
-                }
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        if (data.success) {
+            // Успешно создано, добавьте комнату к таблице без перезагрузки
+            addRoomToTable(data.roomId, roomName, isAuto, time, maxPlayers);
+            const err = document.getElementById('error');
+            err.innerHTML = "";
+            hideCreateRoomForm(); // Скрыть модальное окно
+        } else {
+            const err = document.getElementById('error');
+            err.innerHTML = "";
+            console.log("error", data.errors);
+            for (let KeyErr in data.errors) {
+                err.innerHTML += data.errors[KeyErr] + '<br>';
+                console.log(KeyErr);
             }
-        })
-        .catch(error => console.error('Ошибка при создании комнаты: ' + error));
+        }
+    })
+    .catch(error => console.error('Ошибка при создании комнаты: ' + error));
 }
+
 
 // Функция для добавления комнаты к таблице без перезагрузки
 function addRoomToTable(id, name, isAuto, time, maxPlayers, organizer) {
