@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', e => {
         case 'chat_text':
             textMessageHandler(data);
             break;
-        case 'raiseHand':
+        case 'raise_hand':
             raiseHandNotification(data.struct.sender);
             break;
         case 'send_element':
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', e => {
             startGameHandler();
             break;
         default:
-            console.log('Undefined message type from server');
+            console.log('Undefined message type from server ', data.type);
             break;
     }
 }

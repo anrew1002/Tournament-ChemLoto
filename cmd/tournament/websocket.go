@@ -30,6 +30,9 @@ type sendElement struct {
 type startGame struct {
 	Time int `json:"Time"`
 }
+type initConn struct {
+	Time int
+}
 
 // NewMessage ...
 func NewMessage(messageType string, strct json.RawMessage) *wsmessage {
@@ -84,17 +87,22 @@ func (app *App) MessagingHandler() http.HandlerFunc {
 		if err != nil {
 			log.Println(err)
 		}
-
+		log.Println("Client Connected")
 		//adding connection to connections pull
 		conn := newClient(ws, username, user.Room, admin)
 		app.clientManager.addClient(userSession.ID, user.Room, conn)
 
-		log.Println("Client Connected")
 		// listen indefinitely for new messages coming
 		// through on our WebSocket connection
 		go conn.readerBuffer(app)
 		go conn.writeBuffer()
-
+		// time.Sleep(10 * time.Second)
+		json_struct, err := json.Marshal(initConn{Time: app.clientManager.rooms[conn.room].Time})
+		if err != nil {
+			log.Print("failed Marshaled")
+		}
+		conn.channel <- &wsmessage{Type: "init_connection", Struct: json_struct}
+		log.Println(json_struct)
 	}
 }
 
@@ -155,6 +163,8 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				log.Println("successfuly update user score ", wsmsg_struct)
 			}
 		case "raise_hand":
+			app.clientManager.rooms[clnt.room].stopTicker()
+			log.Printf("Game %s stopped", clnt.room)
 			msg := handMessage{Sender: clnt.name}
 			json_struct, err := json.Marshal(msg)
 			if err != nil {

@@ -20,6 +20,7 @@ type clientManager struct {
 type Room struct {
 	wsconnections map[string]*wsclient
 	models.Room
+	ticker *time.Ticker
 }
 
 func newClientManager(store sqlite.Storage) *clientManager {
@@ -57,7 +58,7 @@ func (clntMngr *clientManager) addRoom(room models.Room) {
 	clntMngr.Lock()
 	defer clntMngr.Unlock()
 
-	clntMngr.rooms[room.Name] = &Room{wsconnections: make(map[string]*wsclient), Room: room}
+	clntMngr.rooms[room.Name] = &Room{wsconnections: make(map[string]*wsclient), Room: room, ticker: time.NewTicker(time.Duration(room.Time) * time.Second)}
 }
 
 func (clntMngr *clientManager) removeRoom(room string) {
@@ -104,8 +105,9 @@ func (room Room) getRandomElement() (string, bool) {
 }
 
 func (room Room) startTicker() {
-	ticker := time.NewTicker(time.Duration(room.Time) * time.Second)
+	ticker := room.ticker
 	log.Println("Ticker set!")
+	ticker.Reset(time.Duration(room.Time) * time.Second)
 	for range ticker.C {
 		elem, ok := room.getRandomElement()
 		if !ok {
@@ -121,4 +123,7 @@ func (room Room) startTicker() {
 			ws.channel <- &wsmessage{Type: "send_element", Struct: json_struct}
 		}
 	}
+}
+func (room Room) stopTicker() {
+	room.ticker.Stop()
 }

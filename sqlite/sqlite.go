@@ -69,7 +69,7 @@ func (s Storage) GetRoom(room_id string) (models.Room, error) {
 func (s Storage) GetRooms() []models.Room {
 	result, err := s.Query("SELECT * FROM rooms")
 	if err != nil {
-		log.Println("CreateRoom: ", err)
+		log.Println("GetRooms: ", err)
 	}
 	defer result.Close()
 	rooms := []models.Room{}
