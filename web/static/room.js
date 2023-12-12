@@ -1,49 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  var timerElement = document.querySelector('.timer')
-  var imageElement = document.getElementById('elementImage')
-  var initialTime = 20
-
-  function updateTimer() {
-    timerElement.textContent = formatTime(initialTime)
-
-    // Добавлено условие для мерцания
-    if (initialTime <= 5 && initialTime % 2 === 0) {
-      imageElement.classList.add('flash')
-    } else {
-      imageElement.classList.remove('flash')
-    }
-
-    // Добавлено условие для анимации смены картинки
-    if (initialTime <= 0) {
-      resetTimer()
-    }
-
-    initialTime--
-    setTimeout(updateTimer, 1000)
-  }
-
-  function formatTime(seconds) {
-    var minutes = Math.floor(seconds / 60)
-    var remainingSeconds = seconds % 60
-
-    var formattedTime = pad(minutes, 2) + ':' + pad(remainingSeconds, 2)
-
-    return formattedTime
-  }
-
-  function pad(number, length) {
-    var str = String(number)
-    while (str.length < length) {
-      str = '0' + str
-    }
-    return str
-  }
-
-  function resetTimer() {
-    initialTime = 20
-  }
-
-  updateTimer()
+  
   var isAdmin = document.getElementById('isAdmin').textContent
   console.log(isAdmin)
 
