@@ -188,7 +188,7 @@ window.addEventListener('load', function () {
 function deleteRoom(roomName) {
     if (confirm('Вы уверены, что хотите удалить эту комнату?')) {
         // Отправить запрос на сервер для удаления комнаты
-        fetch('/api/rooms', {
+        fetch('/api/rooms/'+ encodeURI(roomName), {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
