@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', e => {
         handleElementResponse(data.struct.element, data.struct.last_elements);
         // Сразу сбрасываем и запускаем таймер
         if (timer == 0) {
-          console.log('daaaaaaaaa')
+
         } else {
           resetAndStartTimer(timer);
         }
@@ -80,8 +80,10 @@ document.addEventListener('DOMContentLoaded', e => {
         timer = data.struct.Time;
         break;
       case 'init_connection':
+        timer = data.struct.Time;
         if (data.struct.Started == true) {
           startGameHandler();
+          console.log(timer)
           if (timer == 0) {
             var stopButton = document.getElementById('stopButton');
             stopButton.style.display = 'none';
@@ -89,7 +91,7 @@ document.addEventListener('DOMContentLoaded', e => {
             timerHandler(data.struct.Time);
           }
   
-          timer = data.struct.Time;
+          
           handleElementResponse(data.struct.last_elements[4], data.struct.last_elements);
         }
         break;
@@ -158,7 +160,7 @@ document.addEventListener('DOMContentLoaded', e => {
   function startGameHandler() {
     console.log('startGameHandler called');
     var isAdmin = document.getElementById('isAdmin').textContent
-    if (timer !== 0 && isAdmin == true) {
+    if (timer !== 0 && isAdmin == 'true') {
       
       var stopButton = document.getElementById('stopButton');
       stopButton.style.display = 'block';
