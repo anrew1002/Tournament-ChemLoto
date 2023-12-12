@@ -31,7 +31,8 @@ type startGame struct {
 	Time int `json:"Time"`
 }
 type initConn struct {
-	Time int
+	Time    int
+	Started bool
 }
 
 // NewMessage ...
@@ -97,7 +98,7 @@ func (app *App) MessagingHandler() http.HandlerFunc {
 		go conn.readerBuffer(app)
 		go conn.writeBuffer()
 		// time.Sleep(10 * time.Second)
-		json_struct, err := json.Marshal(initConn{Time: app.clientManager.rooms[conn.room].Time})
+		json_struct, err := json.Marshal(initConn{Time: app.clientManager.rooms[conn.room].Time, Started: app.clientManager.rooms[conn.room].started})
 		if err != nil {
 			log.Print("failed Marshaled")
 		}
@@ -189,15 +190,19 @@ func (clnt *wsclient) readerBuffer(app *App) {
 
 		case "start_game":
 			if clnt.admin {
-				if app.clientManager.rooms[clnt.room].Time != 0 {
-					go app.clientManager.rooms[clnt.room].startTicker()
+				room := app.clientManager.rooms[clnt.room]
+				if room.Time != 0 {
+					go room.startTicker()
 				}
-				log.Printf("Game %s start!", app.clientManager.rooms[clnt.room].Name)
-				json_struct, err := json.Marshal(startGame{Time: app.clientManager.rooms[clnt.room].Time})
+				if !room.started {
+					room.started = true
+				}
+				log.Printf("Game %s start!", room.Name)
+				json_struct, err := json.Marshal(startGame{Time: room.Time})
 				if err != nil {
 					log.Print("failed Marshaled")
 				}
-				for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
+				for _, ws := range room.wsconnections {
 					ws.channel <- &wsmessage{Type: "start_game", Struct: json_struct}
 				}
 			}

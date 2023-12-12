@@ -112,7 +112,7 @@ function timerHandler(time) {
     }
 
     function resetTimer() {
-        initialTime = 20;
+        initialTime = time;
     }
 
     // Start the timer only if it hasn't been started already
