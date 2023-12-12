@@ -46,10 +46,10 @@ func (s Storage) CreateRoom(room models.Room) error {
 	return wrapDBError(err)
 
 }
-func (s Storage) DeleteRoom(room models.Room) error {
-	_, err := s.Exec(`delete from rooms where name = $1`)
+func (s Storage) DeleteRoom(room string) error {
+	_, err := s.Exec(`delete from rooms where name = $1`, room)
 
-	return wrapDBError(err)
+	return err
 
 }
 func (s Storage) GetRoom(room_id string) (models.Room, error) {
