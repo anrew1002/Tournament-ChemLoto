@@ -22,6 +22,7 @@ type Room struct {
 	models.Room
 	ticker         *time.Ticker
 	started        bool
+	paused         bool
 	pushedElements []string
 }
 

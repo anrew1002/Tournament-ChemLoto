@@ -34,6 +34,7 @@ type startGame struct {
 type initConn struct {
 	Time         int
 	Started      bool
+	Paused       bool
 	LastElements []string `json:"last_elements"`
 }
 
@@ -107,7 +108,7 @@ func (app *App) MessagingHandler() http.HandlerFunc {
 		} else {
 			lastElements = room.pushedElements[len(room.pushedElements)-5:]
 		}
-		json_struct, err := json.Marshal(initConn{Time: room.Time, Started: room.started, LastElements: lastElements})
+		json_struct, err := json.Marshal(initConn{Time: room.Time, Started: room.started, Paused: room.paused, LastElements: lastElements})
 		if err != nil {
 			log.Print("failed Marshaled")
 		}
@@ -173,7 +174,7 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				log.Println("successfuly update user score ", wsmsg_struct)
 			}
 		case "raise_hand":
-
+			app.clientManager.rooms[clnt.room].paused = true
 			app.clientManager.rooms[clnt.room].stopTicker()
 
 			log.Printf("Game %s stopped", clnt.room)
@@ -192,6 +193,7 @@ func (clnt *wsclient) readerBuffer(app *App) {
 		case "start_game":
 			if clnt.admin {
 				room := app.clientManager.rooms[clnt.room]
+				room.paused = false
 				if room.Time != 0 {
 					go room.startTicker()
 				}
