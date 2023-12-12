@@ -20,9 +20,9 @@ type clientManager struct {
 type Room struct {
 	wsconnections map[string]*wsclient
 	models.Room
-	ticker  *time.Ticker
-	started bool
-	//pushedElements []string
+	ticker         *time.Ticker
+	started        bool
+	pushedElements []string
 }
 
 func newClientManager(store sqlite.Storage) *clientManager {
@@ -60,7 +60,7 @@ func (clntMngr *clientManager) addRoom(room models.Room) {
 	clntMngr.Lock()
 	defer clntMngr.Unlock()
 
-	clntMngr.rooms[room.Name] = &Room{wsconnections: make(map[string]*wsclient), Room: room}
+	clntMngr.rooms[room.Name] = &Room{wsconnections: make(map[string]*wsclient), Room: room, pushedElements: make([]string, 0, 264)}
 }
 
 func (clntMngr *clientManager) removeRoom(room string) {
@@ -97,6 +97,7 @@ func (room *Room) getRandomElement() (string, bool) {
 			keys = keys[:len(keys)-1]
 		} else {
 			elems[keys[rand_index]] = item - 1
+			room.pushedElements = append(room.pushedElements, keys[rand_index])
 			return keys[rand_index], true
 		}
 		if len(keys) == 0 {
@@ -116,12 +117,16 @@ func (room *Room) startTicker() {
 	}
 }
 func sendRandomItem(room *Room) {
+	// var lastElements = make([]string, 5)
+	// copy(lastElements, room.pushedElements[:5])
+	// log.Println(lastElements)
+	lastElements := room.pushedElements[:5]
 	elem, ok := room.getRandomElement()
 	if !ok {
 		elem = "Empty bag!"
 		return
 	}
-	json_struct, err := json.Marshal(sendElement{Element: elem})
+	json_struct, err := json.Marshal(sendElement{Element: elem, LastElements: lastElements})
 	if err != nil {
 		log.Print("failed Marshaled")
 	}

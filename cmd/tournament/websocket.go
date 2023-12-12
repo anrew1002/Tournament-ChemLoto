@@ -25,14 +25,16 @@ type scoreMessage struct {
 	Score  int    `json:"score"`
 }
 type sendElement struct {
-	Element string `json:"element"`
+	Element      string   `json:"element"`
+	LastElements []string `json:"last_elements"`
 }
 type startGame struct {
 	Time int `json:"Time"`
 }
 type initConn struct {
-	Time    int
-	Started bool
+	Time         int
+	Started      bool
+	LastElements []string `json:"last_elements"`
 }
 
 // NewMessage ...
@@ -98,7 +100,8 @@ func (app *App) MessagingHandler() http.HandlerFunc {
 		go conn.readerBuffer(app)
 		go conn.writeBuffer()
 		// time.Sleep(10 * time.Second)
-		json_struct, err := json.Marshal(initConn{Time: app.clientManager.rooms[conn.room].Time, Started: app.clientManager.rooms[conn.room].started})
+		room := app.clientManager.rooms[conn.room]
+		json_struct, err := json.Marshal(initConn{Time: room.Time, Started: room.started, LastElements: room.pushedElements[:5]})
 		if err != nil {
 			log.Print("failed Marshaled")
 		}
