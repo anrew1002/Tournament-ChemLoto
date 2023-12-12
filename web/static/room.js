@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
   fetchAndUpdateTopPlayers()
 
   // Set up an interval to periodically update the top players table
-  setInterval(fetchAndUpdateTopPlayers, 20000) // Update every minute (adjust as needed)
+  setInterval(fetchAndUpdateTopPlayers, 1000) // Update every minute (adjust as needed)
   var selectedUsername
   function openModal(player) {
     console.log('da')
