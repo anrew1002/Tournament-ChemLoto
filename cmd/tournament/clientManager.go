@@ -20,7 +20,8 @@ type clientManager struct {
 type Room struct {
 	wsconnections map[string]*wsclient
 	models.Room
-	ticker *time.Ticker
+	ticker  *time.Ticker
+	started bool
 }
 
 func newClientManager(store sqlite.Storage) *clientManager {
