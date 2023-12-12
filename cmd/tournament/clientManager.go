@@ -120,16 +120,17 @@ func sendRandomItem(room *Room) {
 	// var lastElements = make([]string, 5)
 	// copy(lastElements, room.pushedElements[:5])
 	// log.Println(lastElements)
+
+	elem, ok := room.getRandomElement()
+	if !ok {
+		elem = "Empty bag!"
+		return
+	}
 	var lastElements []string
 	if len(room.pushedElements) < 5 {
 		lastElements = room.pushedElements
 	} else {
 		lastElements = room.pushedElements[len(room.pushedElements)-5:]
-	}
-	elem, ok := room.getRandomElement()
-	if !ok {
-		elem = "Empty bag!"
-		return
 	}
 	json_struct, err := json.Marshal(sendElement{Element: elem, LastElements: lastElements})
 	if err != nil {

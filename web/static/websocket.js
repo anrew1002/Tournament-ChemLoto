@@ -58,46 +58,39 @@ document.addEventListener('DOMContentLoaded', e => {
         break;
       case 'raise_hand':
         raiseHandNotification(data.struct.sender);
+        pauseTimer();
         break;
-      // case 'stop_game':
-      //   raiseHandNotification(data.struct.sender);
-      //   break;
       case 'send_element':
-        handleElementResponse(data.struct.element);
-        console.log('s');
+        handleElementResponse(data.struct.element, data.struct.last_elements);
         // Сразу сбрасываем и запускаем таймер
         if (timer == 0) {
           console.log('daaaaaaaaa')
-        }
-        else {
+        } else {
           resetAndStartTimer(timer);
         }
-
         break;
       case 'start_game':
         startGameHandler();
         if (timer == 0) {
           var stopButton = document.getElementById('stopButton');
           stopButton.style.display = 'none';
-        }
-        else {
+        } else {
           timerHandler(data.struct.Time);
         }
         timer = data.struct.Time;
         break;
       case 'init_connection':
-        
         if (data.struct.Started == true) {
           startGameHandler();
           if (timer == 0) {
             var stopButton = document.getElementById('stopButton');
             stopButton.style.display = 'none';
-          }
-          else {
+          } else {
             timerHandler(data.struct.Time);
           }
-
+  
           timer = data.struct.Time;
+          handleElementResponse(data.struct.last_elements[4], data.struct.last_elements);
         }
         break;
       default:
@@ -204,23 +197,22 @@ document.addEventListener('DOMContentLoaded', e => {
   let currentElement = ''; // Variable to store the current element
 
   // Assume this function is called when you receive the element data
-  function handleElementResponse(element) {
+  function handleElementResponse(element, lastElements) {
     const elementImage = document.getElementById('elementImage');
-
     // Show the last-elements container if it's not already visible
     const lastElementsContainer = document.getElementById('lastElementsContainer');
     if (lastElementsContainer.style.display === 'none') {
       lastElementsContainer.style.display = 'block';
     }
-
+  
     // Update the elementImage source based on the received element
     elementImage.src = `../items/${element}.svg`;
-
-    // Store the current element
-    currentElement = element;
-
+  
     // Update the last element images dynamically
-    updateLastElementImages();
+    for (let i = 0; i < lastElements.length; i++) {
+      const lastElementImage = document.getElementById(`element${i + 1}`);
+      lastElementImage.src = `../items/${lastElements[i] || 'empty'}.svg`;
+    }
   }
 
   function updateLastElementImages() {
