@@ -101,7 +101,13 @@ func (app *App) MessagingHandler() http.HandlerFunc {
 		go conn.writeBuffer()
 		// time.Sleep(10 * time.Second)
 		room := app.clientManager.rooms[conn.room]
-		json_struct, err := json.Marshal(initConn{Time: room.Time, Started: room.started, LastElements: room.pushedElements[:5]})
+		var lastElements []string
+		if len(room.pushedElements) < 5 {
+			lastElements = room.pushedElements
+		} else {
+			lastElements = room.pushedElements[len(room.pushedElements)-5:]
+		}
+		json_struct, err := json.Marshal(initConn{Time: room.Time, Started: room.started, LastElements: lastElements})
 		if err != nil {
 			log.Print("failed Marshaled")
 		}
