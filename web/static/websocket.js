@@ -67,8 +67,7 @@ document.addEventListener('DOMContentLoaded', e => {
         console.log('s');
         // Сразу сбрасываем и запускаем таймер
         if (timer == 0) {
-          var stopButton = document.getElementById('stopButton');
-          stopButton.style.display = 'none';
+          console.log('daaaaaaaaa')
         }
         else {
           resetAndStartTimer(timer);
@@ -87,6 +86,7 @@ document.addEventListener('DOMContentLoaded', e => {
         timer = data.struct.Time;
         break;
       case 'init_connection':
+        
         if (data.struct.Started == true) {
           startGameHandler();
           if (timer == 0) {
@@ -164,11 +164,14 @@ document.addEventListener('DOMContentLoaded', e => {
 
   function startGameHandler() {
     console.log('startGameHandler called');
-    if (timer !== 0) {
+    var isAdmin = document.getElementById('isAdmin').textContent
+    if (timer !== 0 && isAdmin == true) {
+      
       var stopButton = document.getElementById('stopButton');
       stopButton.style.display = 'block';
+      
     }
-
+    
     var element = document.getElementById('elementImage');
     // Изменяем свойство display на 'block'
     element.style.display = 'block';
@@ -189,7 +192,7 @@ document.addEventListener('DOMContentLoaded', e => {
     } else {
       console.log('startGameButton not found');
     }
-
+   
     // Другие действия, если необходимо
   }
 
