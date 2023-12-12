@@ -164,9 +164,9 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				log.Println("successfuly update user score ", wsmsg_struct)
 			}
 		case "raise_hand":
-			if room := app.clientManager.rooms[clnt.room].ticker; room != nil {
-				app.clientManager.rooms[clnt.room].stopTicker()
-			}
+
+			app.clientManager.rooms[clnt.room].stopTicker()
+
 			log.Printf("Game %s stopped", clnt.room)
 			msg := handMessage{Sender: clnt.name}
 			json_struct, err := json.Marshal(msg)
@@ -178,17 +178,7 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				ws.channel <- &wsmessage{Type: "raise_hand", Struct: json_struct}
 			}
 		case "get_element":
-			elem, ok := app.clientManager.rooms[clnt.room].getRandomElement()
-			if !ok {
-				elem = "Empty bag!"
-			}
-			json_struct, err := json.Marshal(sendElement{Element: elem})
-			if err != nil {
-				log.Print("failed Marshaled")
-			}
-			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
-				ws.channel <- &wsmessage{Type: "send_element", Struct: json_struct}
-			}
+			sendRandomItem(app.clientManager.rooms[clnt.room])
 
 		case "start_game":
 			if clnt.admin {
