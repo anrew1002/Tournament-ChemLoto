@@ -108,20 +108,24 @@ func (room Room) startTicker() {
 	ticker := room.ticker
 	log.Println("Ticker set!")
 	ticker.Reset(time.Duration(room.Time) * time.Second)
+	sendRandomItem(room)
 	for range ticker.C {
-		elem, ok := room.getRandomElement()
-		if !ok {
-			elem = "Empty bag!"
-			return
-		}
-		json_struct, err := json.Marshal(sendElement{Element: elem})
-		if err != nil {
-			log.Print("failed Marshaled")
-		}
-		log.Println(elem)
-		for _, ws := range room.wsconnections {
-			ws.channel <- &wsmessage{Type: "send_element", Struct: json_struct}
-		}
+		sendRandomItem(room)
+	}
+}
+func sendRandomItem(room Room) {
+	elem, ok := room.getRandomElement()
+	if !ok {
+		elem = "Empty bag!"
+		return
+	}
+	json_struct, err := json.Marshal(sendElement{Element: elem})
+	if err != nil {
+		log.Print("failed Marshaled")
+	}
+	log.Println(elem)
+	for _, ws := range room.wsconnections {
+		ws.channel <- &wsmessage{Type: "send_element", Struct: json_struct}
 	}
 }
 func (room Room) stopTicker() {
