@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var imageElement = document.getElementById('elementImage')
   var initialTime = 20
 
-  function updateTimer () {
+  function updateTimer() {
     timerElement.textContent = formatTime(initialTime)
 
     // Добавлено условие для мерцания
@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Добавлено условие для анимации смены картинки
     if (initialTime <= 0) {
-      imageElement.src = '/items/chem_el2.png'
       resetTimer()
     }
 
@@ -23,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setTimeout(updateTimer, 1000)
   }
 
-  function formatTime (seconds) {
+  function formatTime(seconds) {
     var minutes = Math.floor(seconds / 60)
     var remainingSeconds = seconds % 60
 
@@ -32,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return formattedTime
   }
 
-  function pad (number, length) {
+  function pad(number, length) {
     var str = String(number)
     while (str.length < length) {
       str = '0' + str
@@ -40,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return str
   }
 
-  function resetTimer () {
+  function resetTimer() {
     initialTime = 20
   }
 
@@ -48,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var isAdmin = document.getElementById('isAdmin').textContent
   console.log(isAdmin)
 
-  function fetchAndUpdateTopPlayers () {
+  function fetchAndUpdateTopPlayers() {
     fetch('/api/users')
       .then(response => response.json())
       .then(data => {
@@ -94,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Set up an interval to periodically update the top players table
   setInterval(fetchAndUpdateTopPlayers, 20000) // Update every minute (adjust as needed)
   var selectedUsername
-  function openModal (player) {
+  function openModal(player) {
     console.log('da')
     var modal = document.getElementById('myModal')
     var modalTitle = document.getElementById('modalTitle')
@@ -111,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const encodedUsername = encodeURIComponent(selectedUsername)
   }
 
-  function closeModal () {
+  function closeModal() {
     var modal = document.getElementById('myModal')
     modal.style.display = 'none'
   }
@@ -119,13 +118,13 @@ document.addEventListener('DOMContentLoaded', function () {
   // Обработчик клика по кнопке закрытия (крестик)
   document.querySelector('.close-btn').addEventListener('click', closeModal)
 
-  function getSelectedScore (block) {
+  function getSelectedScore(block) {
     // Get the value of the selected radio button in a block
     var selectedRadio = block.querySelector('input:checked')
     return selectedRadio ? selectedRadio.value : null
   }
 
-  function sendScores () {
+  function sendScores() {
     // Получите значения из полей формы
     const alphaScore = getSelectedScore(document.getElementById('alphaBlock'))
     const betaScore = getSelectedScore(document.getElementById('betaBlock'))
@@ -140,63 +139,63 @@ document.addEventListener('DOMContentLoaded', function () {
     const messages = [];
 
     if (alphaScore !== 0) {
-        messages.push({
-            type: 'score_up',
-            struct: {
-                field: "alpha",
-                target: selectedUsername,
-                score: parseInt(alphaScore)
-            }
-        });
+      messages.push({
+        type: 'score_up',
+        struct: {
+          field: "alpha",
+          target: selectedUsername,
+          score: parseInt(alphaScore)
+        }
+      });
     }
 
     if (betaScore !== 0) {
-        messages.push({
-            type: 'score_up',
-            struct: {
-                field: "beta",
-                target: selectedUsername,
-                score: parseInt(betaScore)
-            }
-        });
+      messages.push({
+        type: 'score_up',
+        struct: {
+          field: "beta",
+          target: selectedUsername,
+          score: parseInt(betaScore)
+        }
+      });
     }
 
     if (gammaScore !== 0) {
-        messages.push({
-            type: 'score_up',
-            struct: {
-                field: "gamma",
-                target: selectedUsername,
-                score: parseInt(gammaScore)
-            }
-        });
+      messages.push({
+        type: 'score_up',
+        struct: {
+          field: "gamma",
+          target: selectedUsername,
+          score: parseInt(gammaScore)
+        }
+      });
     }
 
     if (penaltyScore !== 0) {
-        messages.push({
-            type: 'score_up',
-            struct: {
-                field: "penalty",
-                target: selectedUsername,
-                score: parseInt(penaltyScore)
-            }
-        });
+      messages.push({
+        type: 'score_up',
+        struct: {
+          field: "penalty",
+          target: selectedUsername,
+          score: parseInt(penaltyScore)
+        }
+      });
     }
 
     if (manualScore !== 0) {
-        messages.push({
-            type: 'score_up',
-            struct: {
-                field: "manual",
-                target: selectedUsername,
-                score: parseInt(manualScore)
-            }
-        });
+      messages.push({
+        type: 'score_up',
+        struct: {
+          field: "manual",
+          target: selectedUsername,
+          score: parseInt(manualScore)
+        }
+      });
     }
 
     // Отправляем сообщения на сервер
     messages.forEach(message => {
-        socket.send(JSON.stringify(message));
+      socket.send(JSON.stringify(message));
     });
 
     // // Отправьте данные на сервер
@@ -278,7 +277,7 @@ document.getElementById('topToggle').onclick = function () {
 //     // Ваша функция для отправки уведомления о поднятии руки
 
 // }
-function raiseHand () {
+function raiseHand() {
   // Создаем объект сообщения
   const message = {
     type: 'raise_hand'
@@ -289,7 +288,7 @@ function raiseHand () {
   socket.send(JSON.stringify(message))
 }
 
-function getElement () {
+function getElement() {
   // Создаем объект сообщения
   const message = {
     type: 'get_element'
@@ -302,6 +301,10 @@ function startGame() {
   const message = {
     type: 'start_game'
   }
+  var element = document.getElementById('elementImage');
+
+  // Изменяем свойство display на 'block'
+  element.style.display = 'block';
   // Отправляем сообщение на сервер
   socket.send(JSON.stringify(message))
 

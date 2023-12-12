@@ -242,7 +242,6 @@ main {
     width: 100%;
     max-width: 690px;
     height: auto;
-    border-radius: 50%;
     opacity: 1;
 }
 .chat h2 {
