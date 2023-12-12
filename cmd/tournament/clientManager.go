@@ -30,7 +30,7 @@ func newClientManager(store sqlite.Storage) *clientManager {
 	clntMngr := new(clientManager)
 	clntMngr.rooms = make(map[string]*Room)
 	for _, room := range store.GetRooms() {
-		log.Println(room)
+		// log.Println(room)
 		// clntMngr.rooms[room.Name].Max_partic = room.Max_partic
 		// clntMngr.rooms[room.Name].Time = room.Time
 		// clntMngr.rooms[room.Name].wsconnections = make(map[string]*wsclient)

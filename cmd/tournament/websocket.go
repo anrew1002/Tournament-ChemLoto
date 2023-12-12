@@ -21,6 +21,7 @@ type handMessage struct {
 	Sender string `json:"sender"`
 }
 type scoreMessage struct {
+	Field  string `json:"field"`
 	Target string `json:"target"`
 	Score  int    `json:"score"`
 }
@@ -91,7 +92,7 @@ func (app *App) MessagingHandler() http.HandlerFunc {
 		if err != nil {
 			log.Println(err)
 		}
-		log.Println("Client Connected")
+		// log.Println("Client Connected")
 		//adding connection to connections pull
 		conn := newClient(ws, username, user.Room, admin)
 		app.clientManager.addClient(userSession.ID, user.Room, conn)
@@ -113,7 +114,7 @@ func (app *App) MessagingHandler() http.HandlerFunc {
 			log.Print("failed Marshaled")
 		}
 		conn.channel <- &wsmessage{Type: "init_connection", Struct: json_struct}
-		log.Println(json_struct)
+		// log.Println(json_struct)
 	}
 }
 
@@ -122,6 +123,16 @@ func (clnt *wsclient) readerBuffer(app *App) {
 	defer func() {
 		clnt.manager.removeClient(clnt, clnt.room)
 	}()
+	round := map[string]bool{
+		"A": false,
+		"B": false,
+		"Y": false,
+	}
+	round_int := map[string]int{
+		"A": 4,
+		"B": 4,
+		"Y": 4,
+	}
 	for {
 		_, p, err := clnt.ws.ReadMessage()
 		if err != nil {
@@ -138,10 +149,6 @@ func (clnt *wsclient) readerBuffer(app *App) {
 
 		switch wsmsg.Type {
 		case "chat_text":
-			// msg := textMessage{Sender: clnt.name, Payload: p}
-
-			// log.Print("printed: ", string(msg.Struct.(textMessage).Payload))
-			// var wsmsg_struct textMessage
 			var wsmsg_struct string
 			err := json.Unmarshal(wsmsg.Struct, &wsmsg_struct)
 			if err != nil {
@@ -158,20 +165,46 @@ func (clnt *wsclient) readerBuffer(app *App) {
 			}
 
 		case "score_up":
+			var score_up int
 			if clnt.admin {
-				// msg := NewMessage("score_up", scoreMessage{Target: wsmsg.S, Payload: p})
-				// log.Println("score up!", wsmsg)
 				var wsmsg_struct scoreMessage
+
 				err := json.Unmarshal(wsmsg.Struct, &wsmsg_struct)
 				if err != nil {
-					log.Println("score_up: error type assert")
+					log.Println("score_up: error Unmarshal", err)
 					continue
 				}
-				err = app.database.UpdateUserScore(wsmsg_struct.Target, wsmsg_struct.Score)
+				log.Println(wsmsg_struct)
+				switch wsmsg_struct.Field {
+				case "alpha":
+					if wsmsg_struct.Score == 1 {
+						round["A"] = true
+						score_up = round_int["A"]
+					}
+				case "beta":
+					round["B"] = true
+					if wsmsg_struct.Score == 1 {
+						score_up = round_int["B"]
+					}
+				case "gamma":
+					round["Y"] = true
+					if wsmsg_struct.Score == 1 {
+						score_up = round_int["Y"]
+					}
+				case "penalty":
+					if wsmsg_struct.Score == 1 {
+						score_up = -1
+					}
+				case "manual":
+					if wsmsg_struct.Score == 1 {
+						score_up = wsmsg_struct.Score
+					}
+				}
+				err = app.database.UpdateUserScore(wsmsg_struct.Target, score_up)
 				if err != nil {
 					log.Println("user score update:", err)
 				}
-				log.Println("successfuly update user score ", wsmsg_struct)
+				log.Println("successfuly update user score ", score_up)
 			}
 		case "raise_hand":
 			app.clientManager.rooms[clnt.room].paused = true
@@ -183,16 +216,32 @@ func (clnt *wsclient) readerBuffer(app *App) {
 			if err != nil {
 				log.Print("failed Marshaled")
 			}
-			log.Println(json_struct)
+			// log.Println(json_struct)
 			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
 				ws.channel <- &wsmessage{Type: "raise_hand", Struct: json_struct}
 			}
 		case "get_element":
+			room := app.clientManager.rooms[clnt.room]
+			if room.paused {
+				for k, v := range round {
+					if round_int[k] > 0 {
+						round_int[k] -= 1 * boolToInt(v)
+					}
+				}
+			}
+			room.paused = false
 			sendRandomItem(app.clientManager.rooms[clnt.room])
 
 		case "start_game":
 			if clnt.admin {
 				room := app.clientManager.rooms[clnt.room]
+				if room.paused {
+					for k, v := range round {
+						if round_int[k] > 0 {
+							round_int[k] -= 1 * boolToInt(v)
+						}
+					}
+				}
 				room.paused = false
 				if room.Time != 0 {
 					go room.startTicker()
@@ -239,4 +288,11 @@ func (clnt *wsclient) writeBuffer() {
 			}
 		}
 	}
+}
+
+func boolToInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"log"
+	"net"
 	"net/http"
 	"os"
 
@@ -79,8 +80,8 @@ func main() {
 		Addr:    *addr,
 		Handler: r,
 	}
-
-	log.Printf("Starting server on: %s", *addr)
+	ip := GetOutboundIP().String()
+	log.Printf("Starting server on: %s", ip+*addr)
 	log.Fatal(srv.ListenAndServe())
 }
 
@@ -96,4 +97,17 @@ func MustInitApp() *App {
 
 	app.clientManager = newClientManager(app.database)
 	return app
+}
+
+// Get preferred outbound ip of this machine
+func GetOutboundIP() net.IP {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+
+	return localAddr.IP
 }
