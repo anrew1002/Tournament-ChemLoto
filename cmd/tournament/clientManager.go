@@ -22,6 +22,7 @@ type Room struct {
 	models.Room
 	ticker  *time.Ticker
 	started bool
+	//pushedElements []string
 }
 
 func newClientManager(store sqlite.Storage) *clientManager {
@@ -73,7 +74,7 @@ func (clntMngr *clientManager) removeRoom(room string) {
 	}
 }
 
-func (room Room) getRandomElement() (string, bool) {
+func (room *Room) getRandomElement() (string, bool) {
 
 	elems := room.Elements
 	keys := make([]string, len(elems), 12)
@@ -105,7 +106,7 @@ func (room Room) getRandomElement() (string, bool) {
 
 }
 
-func (room Room) startTicker() {
+func (room *Room) startTicker() {
 	room.ticker = time.NewTicker(time.Duration(room.Time) * time.Second)
 	log.Println("Ticker set!")
 	// room.ticker.Reset(time.Duration(room.Time) * time.Second)
@@ -114,7 +115,7 @@ func (room Room) startTicker() {
 		sendRandomItem(room)
 	}
 }
-func sendRandomItem(room Room) {
+func sendRandomItem(room *Room) {
 	elem, ok := room.getRandomElement()
 	if !ok {
 		elem = "Empty bag!"
@@ -129,6 +130,6 @@ func sendRandomItem(room Room) {
 		ws.channel <- &wsmessage{Type: "send_element", Struct: json_struct}
 	}
 }
-func (room Room) stopTicker() {
+func (room *Room) stopTicker() {
 	room.ticker.Stop()
 }
