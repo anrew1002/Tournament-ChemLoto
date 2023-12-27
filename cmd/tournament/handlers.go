@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/anrew1002/Tournament-ChemLoto/models"
 	"github.com/anrew1002/Tournament-ChemLoto/sqlite"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 )
@@ -53,59 +55,63 @@ func (app *App) GetRooms() http.HandlerFunc {
 }
 func (app *App) CreateRoomHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if err := r.ParseForm(); err != nil {
-			fmt.Fprintf(w, "ParseForm() err: %v", err)
+		// if err := r.ParseForm(); err != nil {
+		// 	fmt.Fprintf(w, "ParseForm() err: %v", err)
+		// 	return
+		// }
+		// formErrors := make(map[string]string)
+		// if r.FormValue("roomName") == "" {
+		// 	formErrors["ErrRoomName"] = "Имя должно быть заполнено"
+		// }
+		// if r.FormValue("maxPlayers") == "" {
+		// 	formErrors["ErrMaxPlayers"] = "Кол-во игроков не должно быть пустым"
+		// }
+		data := new(models.Room)
+		err := json.NewDecoder(r.Body).Decode(data)
+		if err != nil {
+			log.Print(err)
+			app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": []string{"Fail to decode JSON"}, "success": false}, nil)
 			return
 		}
-		formErrors := make(map[string]string)
-		if r.FormValue("roomName") == "" {
-			formErrors["ErrRoomName"] = "Имя должно быть заполнено"
-		}
-		if r.FormValue("maxPlayers") == "" {
-			formErrors["ErrMaxPlayers"] = "Кол-во игроков не должно быть пустым"
-		}
-		if len(formErrors) != 0 {
-			// app.render(w, http.StatusUnprocessableEntity, "room_list", formErrors)
-			app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": formErrors, "success": false}, nil)
+		log.Println(data)
+		validate := validator.New()
+		err = validate.Struct(data)
+		// validationErrors := err.(validator.ValidationErrors)
+		if err != nil {
+			app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": []string{err.Error()}, "success": false}, nil)
 			return
 		}
 
-		data := new(models.Room)
-		data.Name = r.FormValue("roomName")
-		if r.FormValue("isAuto") == "true" {
-			time, err := strconv.Atoi(r.FormValue("time"))
-			if err != nil {
-				time = 0
-			}
-			data.Time = time
+		if data.IsAuto == false {
+			// time, err := strconv.Atoi(r.FormValue("time"))
+			// if err != nil {
+			// 	time = 0
+			// }
+			// data.Time = time
+			data.Time = 0
 		}
-		max_partic, err := strconv.Atoi(r.FormValue("maxPlayers"))
-		if err != nil {
-			max_partic = 0
-		}
-		data.Max_partic = max_partic
-		data.Elements = map[string]int{
-			"H":     52,
-			"C":     40,
-			"CH":    24,
-			"CH2":   24,
-			"CH3":   28,
-			"O":     28,
-			"CL":    16,
-			"N":     16,
-			"C6H4":  16,
-			"TRADE": 4,
-			// "C6H4": 16,
-		}
+		// data.Elements = map[string]int{
+		// 	"H":     52,
+		// 	"C":     40,
+		// 	"CH":    24,
+		// 	"CH2":   24,
+		// 	"CH3":   28,
+		// 	"O":     28,
+		// 	"CL":    16,
+		// 	"N":     16,
+		// 	"C6H4":  16,
+		// 	"TRADE": 4,
+		// 	// "C6H4": 16,
+		// }
 		log.Println(data)
 		err = app.database.CreateRoom(*data)
 		// fmt.Printf("err: %T\n", err)
 		// log.Print(err)
 		if err != nil {
 			if errors.Is(err, sqlite.ErrDup) {
-				// log.Print(err)
-				formErrors["ErrRoomName"] = "Такая комната уже существует!"
-				err = app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": formErrors, "success": false}, nil)
+				log.Print(err)
+				// formErrors["ErrRoomName"] = "Такая комната уже существует!"
+				err = app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": []string{"Такая комната уже существует!"}, "success": false}, nil)
 				if err != nil {
 					log.Println(err)
 				}

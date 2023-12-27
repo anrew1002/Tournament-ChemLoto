@@ -9,8 +9,9 @@ type User struct {
 	Admin bool
 }
 type Room struct {
-	Name       string
-	Time       int
-	Max_partic int
-	Elements   map[string]int
+	Name       string         `json:"roomName" validate:"required"`
+	Time       int            `json:"time" validate:"required"`
+	Max_partic int            `json:"maxPlayers" validate:"required"`
+	Elements   map[string]int `json:"elementCounts" validate:"required"`
+	IsAuto     bool           `validate:"required"`
 }
