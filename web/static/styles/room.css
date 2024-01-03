@@ -257,7 +257,13 @@ main {
     max-height: 700px;
     overflow-y: auto;
 }
-
+.top-players li {
+    cursor: pointer;
+  }
+  
+  .top-players li:hover {
+    text-decoration: underline; /* Это добавляет подчеркивание при наведении */
+  }
 .chat-input {
     margin-top: auto;
     display: flex;

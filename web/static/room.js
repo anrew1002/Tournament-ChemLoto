@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  
+
   var isAdmin = document.getElementById('isAdmin').textContent
   console.log(isAdmin)
 
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Фильтруем пользователей по комнате (замените "Название Комнаты" на фактическое название комнаты)
         const usersInRoom = data.users.filter(
-          user => user.Room === roomName.textContent
+          user => user.Room === roomName.textContent && !user.Admin
         )
 
         // Sort users by score in descending order
@@ -24,9 +24,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Loop through the sorted user data and update the table
         usersInRoom.forEach(user => {
           const listItem = document.createElement('li')
-          listItem.textContent = `${user.Admin ? '✪ ' : ''}${user.Username} - ${user.Score} очков`;
+          listItem.textContent = `${user.Username} - ${user.Score} очков`;
 
-          
           // Add a click event listener to each player name
           listItem.addEventListener('click', function () {
             if (isAdmin === 'true') {
@@ -67,8 +66,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function closeModal() {
-    var modal = document.getElementById('myModal')
-    modal.style.display = 'none'
+    var modal = document.getElementById('myModal');
+    modal.style.display = 'none';
+
+    // Сброс значений полей формы
+    resetFormFields();
   }
 
   // Обработчик клика по кнопке закрытия (крестик)
@@ -197,48 +199,12 @@ document.getElementById('topToggle').onclick = function () {
   if (topElement.style.display === 'none') topElement.style.display = 'block'
   else topElement.style.display = 'none'
 }
-// function raiseHand() {
 
-//     // Создаем один раз экземпляр WebSocket
-//     // const wsUrl = 'ws://127.0.0.1/ws';
-//     // const socket = new WebSocket(wsUrl);
-
-//     // // Слушаем событие открытия соединения
-//     // socket.addEventListener('open', (event) => {
-//     //     console.log('WebSocket connection opened:', event);
-//     // });
-
-//     // // Слушаем событие закрытия соединения
-//     // socket.addEventListener('close', (event) => {
-//     //     console.log('WebSocket connection closed:', event);
-//     // });
-
-//     // // Слушаем событие ошибки
-//     // socket.addEventListener('error', (error) => {
-//     //     console.error('WebSocket error:', error);
-//     // });
-
-//     // Слушаем события от сервера
-//     socket.addEventListener('message', (event) => {
-//         const data = JSON.parse(event.data);
-
-//         // Проверяем тип сообщения
-//         if (data.type === 'raiseHandNotification') {
-//             // Ваш код для обработки уведомления о поднятии руки
-//             console.log('Кто-то поднял руку!');
-//             // Здесь вы можете выполнить какие-то действия для отображения уведомления на странице
-//         }
-//     });
-
-//     // Ваша функция для отправки уведомления о поднятии руки
-
-// }
 function raiseHand() {
   // Создаем объект сообщения
   const message = {
     type: 'raise_hand'
   }
-
 
   // Отправляем сообщение на сервер
   socket.send(JSON.stringify(message))
@@ -257,7 +223,7 @@ function startGame() {
   const message = {
     type: 'start_game'
   }
-  
+
   // Отправляем сообщение на сервер
   socket.send(JSON.stringify(message))
 
@@ -267,7 +233,7 @@ function startGame() {
 function stopGame() {
   // Ваш код для начала игры
   const message = {
-    type: 'raise_hand'
+    type: 'raise_hand_admin'
   }
   var startButton = document.getElementById('continueButton');
   startButton.style.display = 'block';
@@ -291,4 +257,14 @@ function continueGame() {
   // Отправляем сообщение на сервер
   socket.send(JSON.stringify(message))
 
+}
+
+function resetFormFields() {
+  // Очистка выбранных флажков
+  document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.checked = false;
+  });
+
+  // Очистка поля ввода вручную
+  document.getElementById('manualScore').value = '';
 }

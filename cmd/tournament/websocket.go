@@ -220,6 +220,20 @@ func (clnt *wsclient) readerBuffer(app *App) {
 			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
 				ws.channel <- &wsmessage{Type: "raise_hand", Struct: json_struct}
 			}
+		case "raise_hand_admin":
+			app.clientManager.rooms[clnt.room].paused = true
+			app.clientManager.rooms[clnt.room].stopTicker()
+
+			log.Printf("Game %s stopped by admin", clnt.room)
+			msg := handMessage{Sender: clnt.name}
+			json_struct, err := json.Marshal(msg)
+			if err != nil {
+				log.Print("failed Marshaled")
+			}
+			// log.Println(json_struct)
+			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
+				ws.channel <- &wsmessage{Type: "raise_hand_admin", Struct: json_struct}
+			}
 		case "get_element":
 			room := app.clientManager.rooms[clnt.room]
 			if room.paused {

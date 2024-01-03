@@ -62,13 +62,28 @@ document.addEventListener('DOMContentLoaded', e => {
       case 'raise_hand':
         raiseHandNotification(data.struct.sender);
         pauseTimer();
-        if (!isStopButtonHidden && isAdmin ==='true') {
-        var startButton = document.getElementById('continueButton');
-        startButton.style.display = 'block';
+        console.log('поднятие руки дефолт')
+        console.log(isStopButtonHidden)
+        if (isStopButtonHidden === false && isAdmin === 'true') {
+          var startButton = document.getElementById('continueButton');
+          startButton.style.display = 'block';
+          var stopButton = document.getElementById('stopButton');
+          stopButton.style.display = 'none';
+          isStopButtonHidden = true;
+        }
+        break;
+      case 'raise_hand_admin':
+        console.log('админ поднял ')
+        console.log(isStopButtonHidden)
+        raiseHandAdminNotification(data.struct.sender)
+        pauseTimer();
 
-        var stopButton = document.getElementById('stopButton');
-        stopButton.style.display = 'none';
-        isStopButtonHidden = true;
+        if (isStopButtonHidden === false && isAdmin === 'true') {
+          var startButton = document.getElementById('continueButton');
+          startButton.style.display = 'block';
+          var stopButton = document.getElementById('stopButton');
+          stopButton.style.display = 'none';
+          isStopButtonHidden = true;
         }
         break;
       case 'send_element':
@@ -99,21 +114,21 @@ document.addEventListener('DOMContentLoaded', e => {
           if (timer === 0 && !isStopButtonHidden && isAdmin === 'true') {
             var stopButton = document.getElementById('stopButton');
             stopButton.style.display = 'none';
-            
+
             // Устанавливаем флаг в true после первого скрытия
             isStopButtonHidden = true;
-        } else if (timer !== 0) {
+          } else if (timer !== 0) {
             timerHandler(data.struct.Time);
-        }
+          }
           if (data.struct.Paused === true) {
-            if (isAdmin === 'true'){
+            if (isAdmin === 'true') {
               var startButton = document.getElementById('continueButton');
-            startButton.style.display = 'block';
+              startButton.style.display = 'block';
 
-            var stopButton = document.getElementById('stopButton');
-            stopButton.style.display = 'none';
+              var stopButton = document.getElementById('stopButton');
+              stopButton.style.display = 'none';
             }
-            
+
             pauseTimer()
           }
           console.log(data.struct.last_elements)
@@ -196,6 +211,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
   function startGameHandler() {
     console.log('startGameHandler called');
+    isStopButtonHidden = false
     var isAdmin = document.getElementById('isAdmin').textContent
     if (timer !== 0 && isAdmin == 'true') {
 
@@ -231,13 +247,9 @@ document.addEventListener('DOMContentLoaded', e => {
   }
 
 
-
-
-
   let currentElementIndex = 5; // Variable to store the index of the current element, starting from the last cell
   let currentElement = ''; // Variable to store the current element
 
-  // Assume this function is called when you receive the element data
   function handleElementResponse(element, lastElements) {
     const elementImage = document.getElementById('elementImage');
     // Show the last-elements container if it's not already visible
@@ -249,12 +261,17 @@ document.addEventListener('DOMContentLoaded', e => {
     // Update the elementImage source based on the received element
     elementImage.src = `../items/${element}.svg`;
 
+    // Ensure lastElements has at least 5 elements, filling with null if needed
+    lastElements = lastElements.concat(Array.from({ length: 5 - lastElements.length }, () => null));
+
     // Update the last element images dynamically
-    for (let i = 0; i < lastElements.length; i++) {
+    for (let i = 0; i < 5; i++) {
       const lastElementImage = document.getElementById(`element${i + 1}`);
-      lastElementImage.src = `../items/${lastElements[i] || 'empty'}.svg`;
+      lastElementImage.src = lastElements[i] ? `../items/${lastElements[i]}.svg` : `../items/UNDEFINED.svg`;
+
     }
   }
+
 
   function updateLastElementImages() {
     for (let i = 5; i > 1; i--) {
@@ -293,6 +310,29 @@ document.addEventListener('DOMContentLoaded', e => {
     setTimeout(function () {
       notificationContainer.classList.remove('show')
     }, 8000)
+  }
+  function raiseHandAdminNotification(username) {
+    const notificationContainer = document.getElementById('notification-container');
+    const notificationText = document.getElementById('notification-text');
+  
+    // Устанавливаем текст уведомления с именем пользователя
+    notificationText.textContent = `Администратор ${username} Приостанавливает игру!`;
+  
+    // Применяем стиль к тексту уведомления (изменение размера шрифта)
+    notificationText.style.fontSize = '40px';
+  
+    // Показываем уведомление
+    notificationContainer.classList.add('show');
+  
+    // Проигрываем звук
+    playNotificationSound();
+  
+    // Скрываем уведомление через 8 секунд
+    setTimeout(function () {
+      notificationContainer.classList.remove('show');
+      // Возвращаем размер шрифта к стандартному значению (если необходимо)
+      notificationText.style.fontSize = '';
+    }, 8000);
   }
   function playNotificationSound() {
     var notificationSound = document.getElementById('notification-sound')
