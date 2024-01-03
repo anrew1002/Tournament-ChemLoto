@@ -187,18 +187,37 @@ document.addEventListener('DOMContentLoaded', function () {
     closeModal()
   })
 })
-document.getElementById('chatToggle').onclick = function () {
-  var chatElement = document.querySelector('.chat')
+const chatToggle = document.getElementById('chatToggle');
+const topToggle = document.getElementById('topToggle');
 
-  if (chatElement.style.display === 'none') chatElement.style.display = 'flex'
-  else chatElement.style.display = 'none'
+chatToggle.onclick = function () {
+  var chatElement = document.querySelector('.chat')
+  console.log(chatElement.style.display)
+  if (chatElement.style.display === 'none' || chatElement.style.display === '') {
+    chatElement.style.display = 'flex'
+    topToggle.style.display = 'none'
+  }
+  else {
+    chatElement.style.display = 'none'
+    topToggle.style.display = 'inline-block'
+  }
 }
-document.getElementById('topToggle').onclick = function () {
+topToggle.onclick = function () {
   var topElement = document.querySelector('.top-players')
 
-  if (topElement.style.display === 'none') topElement.style.display = 'block'
-  else topElement.style.display = 'none'
+  if (topElement.style.display === 'none' || topElement.style.display === '') {
+    topElement.style.display = 'block'
+    chatToggle.style.display = 'none'
+  }
+  else {
+    topElement.style.display = 'none'
+    chatToggle.style.display = 'inline-block'
+  }
 }
+
+{/* <button id="chatToggle">Чат</button>
+            <button id="topToggle">ТОП</button> */}
+
 
 function raiseHand() {
   // Создаем объект сообщения
