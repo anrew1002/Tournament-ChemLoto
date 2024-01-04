@@ -96,6 +96,10 @@ document.addEventListener('DOMContentLoaded', e => {
         }
         break;
       case 'start_game':
+        if (isAdmin === 'false'){
+          var button = document.querySelector('.raise-hand-btn');
+          button.style.display = 'block';
+        }
         startGameHandler();
         resumeTimer()
         if (timer == 0 && isAdmin === 'true') {
@@ -108,7 +112,12 @@ document.addEventListener('DOMContentLoaded', e => {
         break;
       case 'init_connection':
         timer = data.struct.Time;
-        if (data.struct.Started == true) {
+        if (data.struct.Started == true ) {
+          if (isAdmin === 'false'){
+            var button = document.querySelector('.raise-hand-btn');
+          button.style.display = 'block';
+          }
+          
           startGameHandler();
           console.log(timer)
           if (timer === 0 && !isStopButtonHidden && isAdmin === 'true') {
@@ -133,6 +142,10 @@ document.addEventListener('DOMContentLoaded', e => {
           }
           console.log(data.struct.last_elements)
           handleElementResponse(data.struct.last_elements[data.struct.last_elements.length - 1], data.struct.last_elements);
+        }
+        else if (data.struct.Started == false){
+          var button = document.querySelector('.raise-hand-btn');
+          button.style.display = 'none';
         }
         break;
       default:

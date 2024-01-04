@@ -119,6 +119,7 @@ header {
     transition: background-color 0.3s;
     min-width: 120px;
     /* Устанавливаем минимальную ширину */
+    text-align: center;
 }
 
 .logout-btn:hover {
