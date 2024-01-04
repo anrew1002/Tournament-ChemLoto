@@ -107,13 +107,13 @@ function addRoomToTable (id, name, isAuto, time, maxPlayers, organizer) {
   var deleteButton = document.createElement('button')
   deleteButton.textContent = 'Удалить'
   deleteButton.addEventListener('click', function () {
-    deleteRoom(id) // Вызываем функцию удаления при нажатии на кнопку "Удалить"
+    console.log(room.name)
+    deleteRoom(room.name) // Используйте room.roomName
   })
 
   // Добавляем кнопку "Удалить" в ячейку
   cell5.appendChild(deleteButton)
 }
-
 // Функция для обновления данных о комнатах на странице
 function updateRoomList () {
   var delete_th = document.getElementById('if_admin')
@@ -134,7 +134,6 @@ function updateRoomList () {
         var cell2 = row.insertCell(1)
         var cell3 = row.insertCell(2)
         var cell4 = row.insertCell(3)
-        console.log(cell4)
         if (delete_th != null) {
           var cell5 = row.insertCell(4)
         }
@@ -144,7 +143,6 @@ function updateRoomList () {
         roomLink.textContent = room.roomName
         roomLink.href = '/rooms/' + encodeURI(room.roomName) // Set the href attribute to the room URL
         cell1.appendChild(roomLink)
-
         cell2.innerHTML = room.time > 0 ? 'Да' : 'Нет'
         cell3.innerHTML = room.time
         cell4.innerHTML = room.maxPlayers // Используем правильное название переменной
@@ -154,7 +152,8 @@ function updateRoomList () {
           var deleteButton = document.createElement('button')
           deleteButton.textContent = 'Удалить'
           deleteButton.addEventListener('click', function () {
-            deleteRoom(room.Name) // Вызываем функцию удаления при нажатии на кнопку "Удалить"
+            console.log(room.roomName)
+            deleteRoom(room.roomName) // Вызываем функцию удаления при нажатии на кнопку "Удалить"
           })
 
           // Добавляем кнопку "Удалить" в ячейку
@@ -194,7 +193,9 @@ window.addEventListener('load', function () {
   updateRoomList() // Обновление при загрузке страницы
   autoUpdateRoomList() // Автоматическое обновление каждые 5 секунд
 })
+
 function deleteRoom (roomName) {
+  console.log(roomName)
   if (confirm('Вы уверены, что хотите удалить эту комнату?')) {
     // Отправить запрос на сервер для удаления комнаты
     fetch('/api/rooms/' + encodeURI(roomName), {

@@ -144,8 +144,11 @@ document.addEventListener('DOMContentLoaded', e => {
           handleElementResponse(data.struct.last_elements[data.struct.last_elements.length - 1], data.struct.last_elements);
         }
         else if (data.struct.Started == false){
-          var button = document.querySelector('.raise-hand-btn');
+          if (isAdmin ==='false'){
+            var button = document.querySelector('.raise-hand-btn');
           button.style.display = 'none';
+          }
+          
         }
         break;
       default:

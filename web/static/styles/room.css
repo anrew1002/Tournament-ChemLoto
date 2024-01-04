@@ -120,6 +120,7 @@ header {
     min-width: 120px;
     /* Устанавливаем минимальную ширину */
     text-align: center;
+    align-items: center;
 }
 
 .logout-btn:hover {
@@ -179,6 +180,7 @@ main {
     justify-content: space-between;
     align-items: center;
     padding: 8px;
+    word-break: break-all; /* Добавлено для переноса длинных слов */
 }
 
 .top-players li:last-child {
@@ -189,7 +191,9 @@ main {
 .top-players li span {
     font-weight: bold;
     margin-right: 10px;
+    word-break: break-all; /* Добавлено для переноса длинных слов */
 }
+
 
 .top-players li:nth-child(1) {
     background-color: #FFD700;
