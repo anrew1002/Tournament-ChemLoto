@@ -2,10 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"math/rand"
-	"strings"
 	"sync"
 	"time"
 
@@ -90,8 +88,8 @@ func (room *Room) getRandomElement() (string, bool) {
 			// i++
 		}
 	}
-	output := "'" + strings.Join(keys, `','`) + `'`
-	fmt.Println(output)
+	// output := "'" + strings.Join(keys, `','`) + `'`
+	// fmt.Println(output)
 	if len(keys) == 0 {
 		return "nil", false
 	}
@@ -107,12 +105,12 @@ func (room *Room) getRandomElement() (string, bool) {
 		}
 		if item == 0 {
 			keys = removeElement(keys, keys[rand_index])
-			log.Println("removing ", keys[rand_index])
+			// log.Println("removing ", keys[rand_index])
 		} else {
 			elems[keys[rand_index]] = item - 1
 			room.pushedElements = append(room.pushedElements, keys[rand_index])
-			output := "'" + strings.Join(keys, `','`) + `'`
-			fmt.Println(output)
+			// output := "'" + strings.Join(keys, `','`) + `'`
+			// fmt.Println(output)
 			return keys[rand_index], true
 		}
 	}
@@ -136,7 +134,7 @@ func sendRandomItem(room *Room) {
 	elem, ok := room.getRandomElement()
 	if !ok {
 		elem = "Empty bag!"
-		log.Println("EMMMMMMMMMMMMMMPTY")
+
 	}
 	var lastElements []string
 	if len(room.pushedElements) < 5 {
