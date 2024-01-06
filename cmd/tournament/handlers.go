@@ -14,7 +14,6 @@ import (
 	"github.com/anrew1002/Tournament-ChemLoto/models"
 	"github.com/anrew1002/Tournament-ChemLoto/sqlite"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 )
@@ -73,9 +72,8 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 			app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": []string{"Fail to decode JSON"}, "success": false}, nil)
 			return
 		}
-		log.Println(data)
-		validate := validator.New()
-		err = validate.Struct(data)
+		log.Printf("%+v", data)
+		err = app.validate.Struct(data)
 		// validationErrors := err.(validator.ValidationErrors)
 		if err != nil {
 			app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": []string{err.Error()}, "success": false}, nil)

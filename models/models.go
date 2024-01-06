@@ -13,5 +13,5 @@ type Room struct {
 	Time       int            `json:"time" validate:"required"`
 	Max_partic int            `json:"maxPlayers" validate:"required"`
 	Elements   map[string]int `json:"elementCounts" validate:"required"`
-	IsAuto     bool           `validate:"required"`
+	IsAuto     bool           `json:"isAuto"`
 }

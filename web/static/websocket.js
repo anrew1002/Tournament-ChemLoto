@@ -14,7 +14,10 @@ document.addEventListener('DOMContentLoaded', e => {
   setWebsocket()
 
   function setWebsocket() {
-    socket = new WebSocket('ws://127.0.0.1:80/ws')
+    var tcp = window.location.protocol === 'https:' ? 'wss://' : 'ws://'
+    var host = window.location.host
+    var path = '/ws'
+    socket = new WebSocket(tcp + host + path);
     socket.onmessage = function (event) {
       messageHandler(JSON.parse(event.data))
     }
@@ -96,7 +99,7 @@ document.addEventListener('DOMContentLoaded', e => {
         }
         break;
       case 'start_game':
-        if (isAdmin === 'false'){
+        if (isAdmin === 'false') {
           var button = document.querySelector('.raise-hand-btn');
           button.style.display = 'block';
         }
@@ -112,12 +115,12 @@ document.addEventListener('DOMContentLoaded', e => {
         break;
       case 'init_connection':
         timer = data.struct.Time;
-        if (data.struct.Started == true ) {
-          if (isAdmin === 'false'){
+        if (data.struct.Started == true) {
+          if (isAdmin === 'false') {
             var button = document.querySelector('.raise-hand-btn');
-          button.style.display = 'block';
+            button.style.display = 'block';
           }
-          
+
           startGameHandler();
           console.log(timer)
           if (timer === 0 && !isStopButtonHidden && isAdmin === 'true') {
@@ -143,12 +146,12 @@ document.addEventListener('DOMContentLoaded', e => {
           console.log(data.struct.last_elements)
           handleElementResponse(data.struct.last_elements[data.struct.last_elements.length - 1], data.struct.last_elements);
         }
-        else if (data.struct.Started == false){
-          if (isAdmin ==='false'){
+        else if (data.struct.Started == false) {
+          if (isAdmin === 'false') {
             var button = document.querySelector('.raise-hand-btn');
-          button.style.display = 'none';
+            button.style.display = 'none';
           }
-          
+
         }
         break;
       default:
@@ -330,19 +333,19 @@ document.addEventListener('DOMContentLoaded', e => {
   function raiseHandAdminNotification(username) {
     const notificationContainer = document.getElementById('notification-container');
     const notificationText = document.getElementById('notification-text');
-  
+
     // Устанавливаем текст уведомления с именем пользователя
     notificationText.textContent = `Администратор ${username} Приостанавливает игру!`;
-  
+
     // Применяем стиль к тексту уведомления (изменение размера шрифта)
     notificationText.style.fontSize = '40px';
-  
+
     // Показываем уведомление
     notificationContainer.classList.add('show');
-  
+
     // Проигрываем звук
     playNotificationSound();
-  
+
     // Скрываем уведомление через 8 секунд
     setTimeout(function () {
       notificationContainer.classList.remove('show');

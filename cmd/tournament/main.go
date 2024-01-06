@@ -10,6 +10,7 @@ import (
 
 	"github.com/anrew1002/Tournament-ChemLoto/sqlite"
 	"github.com/anrew1002/Tournament-ChemLoto/sqlitestore"
+	"github.com/go-playground/validator/v10"
 	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/go-chi/chi/middleware"
@@ -20,6 +21,7 @@ type App struct {
 	database      sqlite.Storage
 	CS            *sqlitestore.SqliteStore
 	clientManager *clientManager
+	validate      *validator.Validate
 }
 
 func checkFileExists(filePath string) bool {
@@ -96,6 +98,8 @@ func MustInitApp() *App {
 	app.CS = cs
 
 	app.clientManager = newClientManager(app.database)
+
+	app.validate = validator.New()
 	return app
 }
 

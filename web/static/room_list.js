@@ -79,7 +79,7 @@ function createRoom () {
         }
       }
     })
-    .catch(error => console.error('Ошибка при создании комнаты: ' + error))
+    .catch(error => {console.error('Ошибка при создании комнаты: ' + error); console.log(data)})
 }
 
 // Функция для добавления комнаты к таблице без перезагрузки
