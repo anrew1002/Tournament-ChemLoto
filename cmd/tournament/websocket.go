@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -271,6 +272,7 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				for _, ws := range room.wsconnections {
 					ws.channel <- &wsmessage{Type: "start_game", Struct: json_struct}
 				}
+				fmt.Println(room.Elements)
 			}
 		default:
 			log.Println("websocket get undefined message type: ", wsmsg.Type)

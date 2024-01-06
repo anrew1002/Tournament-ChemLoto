@@ -80,7 +80,7 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 			return
 		}
 
-		if data.IsAuto == false {
+		if !data.IsAuto {
 			// time, err := strconv.Atoi(r.FormValue("time"))
 			// if err != nil {
 			// 	time = 0

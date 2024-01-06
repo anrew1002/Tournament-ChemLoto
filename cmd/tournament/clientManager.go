@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
@@ -78,31 +80,40 @@ func (clntMngr *clientManager) removeRoom(room string) {
 func (room *Room) getRandomElement() (string, bool) {
 
 	elems := room.Elements
-	keys := make([]string, len(elems), 12)
+	keys := make([]string, 0, 12)
 	// empty_el := make([]string, 12)
-	i := 0
-	for k := range elems {
-		keys[i] = k
-		i++
+	// i := 0
+	for k, v := range elems {
+		if v != 0 {
+			log.Println(k, " ", v, " ")
+			keys = append(keys, k)
+			// i++
+		}
 	}
+	output := "'" + strings.Join(keys, `','`) + `'`
+	fmt.Println(output)
+	if len(keys) == 0 {
+		return "nil", false
+	}
+
 	// log.Println(len(elems))
 
 	for {
 		rand_index := rand.Intn(len(keys))
 		item, ok := elems[keys[rand_index]]
 		if !ok {
-			log.Println("something went wrong when pick an element")
+			log.Println("something went wrong when pick an element: ", keys[rand_index])
+			return "nil", false
 		}
 		if item == 0 {
-			keys[rand_index] = keys[len(keys)-1]
-			keys = keys[:len(keys)-1]
+			keys = removeElement(keys, keys[rand_index])
+			log.Println("removing ", keys[rand_index])
 		} else {
 			elems[keys[rand_index]] = item - 1
 			room.pushedElements = append(room.pushedElements, keys[rand_index])
+			output := "'" + strings.Join(keys, `','`) + `'`
+			fmt.Println(output)
 			return keys[rand_index], true
-		}
-		if len(keys) == 0 {
-			return "nil", false
 		}
 	}
 
@@ -125,7 +136,7 @@ func sendRandomItem(room *Room) {
 	elem, ok := room.getRandomElement()
 	if !ok {
 		elem = "Empty bag!"
-		return
+		log.Println("EMMMMMMMMMMMMMMPTY")
 	}
 	var lastElements []string
 	if len(room.pushedElements) < 5 {
@@ -146,4 +157,14 @@ func (room *Room) stopTicker() {
 	if room.ticker != nil {
 		room.ticker.Stop()
 	}
+}
+
+func removeElement(slice []string, value string) []string {
+	for i := 0; i < len(slice); i++ {
+		if slice[i] == value {
+			slice = append(slice[:i], slice[i+1:]...)
+			break
+		}
+	}
+	return slice
 }
