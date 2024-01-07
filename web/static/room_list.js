@@ -108,7 +108,7 @@ function addRoomToTable (id, name, isAuto, time, maxPlayers, organizer) {
   deleteButton.textContent = 'Удалить'
   deleteButton.addEventListener('click', function () {
     console.log(room.name)
-    deleteRoom(room.name) // Используйте room.roomName
+    deleteRooms(room.name) // Используйте room.roomName
   })
 
   // Добавляем кнопку "Удалить" в ячейку
@@ -153,7 +153,7 @@ function updateRoomList () {
           deleteButton.textContent = 'Удалить'
           deleteButton.addEventListener('click', function () {
             console.log(room.roomName)
-            deleteRoom(room.roomName) // Вызываем функцию удаления при нажатии на кнопку "Удалить"
+            deleteRooms(room.roomName) // Вызываем функцию удаления при нажатии на кнопку "Удалить"
           })
 
           // Добавляем кнопку "Удалить" в ячейку
@@ -194,7 +194,7 @@ window.addEventListener('load', function () {
   autoUpdateRoomList() // Автоматическое обновление каждые 5 секунд
 })
 
-function deleteRoom (roomName) {
+function deleteRooms (roomName) {
   console.log(roomName)
   if (confirm('Вы уверены, что хотите удалить эту комнату?')) {
     // Отправить запрос на сервер для удаления комнаты

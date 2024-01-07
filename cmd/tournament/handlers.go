@@ -186,6 +186,16 @@ func (app *App) RoomDeleteHandler() http.HandlerFunc {
 		}
 	}
 }
+func (app *App) RoomsClearHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := app.database.DeleteAllRooms()
+		if err != nil {
+			app.writeJSON(w, http.StatusInternalServerError, envelope{"success": false}, nil)
+			log.Println(err)
+		}
+		app.writeJSON(w, http.StatusOK, envelope{"success": true}, nil)
+	}
+}
 func (app *App) UserHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.RequestURI)
@@ -226,6 +236,16 @@ func (app *App) GetUsers() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		users := app.database.GetUsers()
 		app.writeJSON(w, http.StatusOK, envelope{"users": users}, nil)
+	}
+}
+func (app *App) UsersClearHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := app.database.DeleteAllRooms()
+		if err != nil {
+			app.writeJSON(w, http.StatusInternalServerError, envelope{"success": false}, nil)
+			log.Println(err)
+		}
+		app.writeJSON(w, http.StatusOK, envelope{"success": true}, nil)
 	}
 }
 

@@ -52,6 +52,18 @@ func (s Storage) DeleteRoom(room string) error {
 	return err
 
 }
+func (s Storage) DeleteAllRooms() error {
+	_, err := s.Exec(`DELETE FROM rooms;`)
+
+	return err
+
+}
+func (s Storage) DeleteAllUsers() error {
+	_, err := s.Exec(`DELETE FROM users;DELETE FROM sessions;`)
+
+	return err
+
+}
 func (s Storage) GetRoom(room_id string) (models.Room, error) {
 	result := s.QueryRow("SELECT * FROM rooms WHERE name = $1 ", room_id)
 	var Elem_string string

@@ -50,6 +50,10 @@ func main() {
 		r.Get("/hub", app.HubHandler())
 		r.Get("/api/rooms", app.GetRooms())
 		r.Get("/api/users", app.GetUsers())
+
+		r.Delete("/api/users", app.UsersClearHandler())
+		r.Delete("/api/rooms", app.RoomsClearHandler())
+
 		r.Delete("/api/rooms/{room_id}", app.RoomDeleteHandler())
 		r.Get("/rooms/{room_id}", app.RoomHandler())
 		r.Get("/ws", app.MessagingHandler())

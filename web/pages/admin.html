@@ -70,15 +70,16 @@
     <div class="container">
             <p>Здравствуйте, {{.Username}}!</p>
             <div class="button-container">
-            <form method="post" action="admin_panel.php">
-            <button type="submit" name="clearRooms" class="button red">Очистить список комнат</button>
-            </form>
-            <form method="post" action="admin_panel.php">
-            <button type="submit" name="clearUsers" class="button red">Очистить базу данных пользователей</button>
-            </form>
+            <!-- <form method="post" action="admin_panel.php"> -->
+            <button id="roomdel"type="submit" name="clearRooms" class="button red">Очистить список комнат</button>
+            <!-- </form> -->
+            <!-- <form method="post" action="admin_panel.php"> -->
+            <button id="userdel" type="submit" name="clearUsers" class="button red">Очистить базу данных пользователей</button>
+            <!-- </form> -->
             </div>
             <br>
             <a href="/hub" class="button">Вернуться к комнатам</a>
     </div>
+    <script src="../static/admin.js" defer></script>
 </body>
 </html>
