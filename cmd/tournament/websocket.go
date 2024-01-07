@@ -193,13 +193,13 @@ func (clnt *wsclient) readerBuffer(app *App) {
 						score_up = round_int["Y"]
 					}
 				case "penalty":
-					if wsmsg_struct.Score == 1 {
+					if wsmsg_struct.Score == -1 {
 						score_up = -1
 					}
 				case "manual":
-					if wsmsg_struct.Score == 1 {
-						score_up = wsmsg_struct.Score
-					}
+					// if wsmsg_struct.Score == 1 {
+					score_up = wsmsg_struct.Score
+					// }
 				}
 				err = app.database.UpdateUserScore(wsmsg_struct.Target, score_up)
 				if err != nil {
