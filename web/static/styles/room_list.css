@@ -1,8 +1,35 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Rubik', Arial, Helvetica, sans-serif;
     background-color: #f5f5f5;
 }
 
+button {
+    background-color: #1f6ec2;
+    color: #ffffff;
+    border: none;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    font-family: 'Rubik', Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#if_admin,
+#admin_panel_button {
+    background-color: #007BFF;
+    padding: 10px 20px;
+
+}
+button:hover {
+    background-color: #15548a; /* Новый цвет фона при наведении */
+}
+
+#if_admin:hover,
+#admin_panel_button:hover {
+    background-color: #0056b3; /* Новый цвет фона при наведении */
+}
 .close {
     position: absolute;
     top: 10px;
@@ -11,24 +38,30 @@ body {
     color: red;
     cursor: pointer;
 }
+
 .modal-content form label {
     display: block;
-    margin-bottom: 10px; /* Adjust the value to your preference */
+    margin-bottom: 10px;
+    /* Adjust the value to your preference */
 }
 
 .chemical-element {
-    margin-bottom: 10px; /* Adjust the value to your preference */
+    margin-bottom: 10px;
+    /* Adjust the value to your preference */
 }
+
 .modal {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Set the modal height to 100% of the viewport height */
+    height: 100vh;
+    /* Set the modal height to 100% of the viewport height */
 }
 
 .modal-content {
     text-align: center;
 }
+
 /* Add this to your existing CSS or create a new style block */
 .modal-content form input {
     width: 100%;
@@ -56,18 +89,22 @@ body {
     cursor: pointer;
     font-size: 16px;
 }
-
+.modal-content form button:hover {
+    background-color: #367d39;
+}
 /* Style the error message */
 #error {
     color: red;
     margin-top: 10px;
     font-size: 14px;
 }
+
 #header {
     text-align: right;
     padding: 10px;
     font-weight: bold;
     font-size: larger;
+
 }
 
 #content {
@@ -163,14 +200,18 @@ body {
 
 .chemical-element {
     display: flex;
-    align-items: center;  /* Выравниваем содержимое по вертикали */
+    align-items: center;
+    /* Выравниваем содержимое по вертикали */
     margin-bottom: 10px;
 }
 
 .element-img {
-    width: 40px;   /* Желаемая ширина картинки */
-    height: 40px;  /* Высота картинки равна высоте input поля */
-    margin-right: 5px;  /* Добавим немного отступа между картинкой и input полем */
+    width: 40px;
+    /* Желаемая ширина картинки */
+    height: 40px;
+    /* Высота картинки равна высоте input поля */
+    margin-right: 5px;
+    /* Добавим немного отступа между картинкой и input полем */
 }
 
 .chemical-element input {

@@ -11,6 +11,24 @@
     }
 }
 
+
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Rubik',Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    background-color: #f0f8ff;
+    /* Голубой фон */
+}
+
+
+
 /* Добавлены стили для блока таймера */
 .timer {
     font-family: monospace;
@@ -28,19 +46,7 @@
     background-color: #cdcbcb; /* Adjust the background color as needed */
     margin-bottom: 10px;
 }
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-    background-color: #f0f8ff;
-    /* Голубой фон */
-}
+
 
 .flash {
     animation: flashAnimation 0.5s infinite alternate;
@@ -60,7 +66,7 @@ header {
     text-align: left;
     margin: 0;
     /* Убираем отступы */
-    flex-grow: 1;
+
     /* Занимает доступное пространство */
     padding-left: 60px;
 }
@@ -333,17 +339,37 @@ main {
     transition: background-color 0.3s;
     margin-top: 10px;
 }
-
-.raise-hand-btn,.admin-btn:hover {
+.place_message{
+    font-family: 'Rubik', Arial, Helvetica, sans-serif;
+}
+.btn {
+    background-color: #4682B4;
+    color: #fff;
+    height: 35px;
+    border-radius: 5px;
+    border: 1px solid #343434;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Плавный переход цвета фона */
+    font-family: 'Rubik', Arial, Helvetica, sans-serif;
+}
+button{
+    font-family: 'Rubik', Arial, Helvetica, sans-serif;
+}
+.btn:hover {
+    background-color: #1E90FF; /* Новый цвет фона при наведении */
+}
+.raise-hand-btn:hover ,.admin-btn:hover,.btn:hover {
     background-color: #1E90FF;
     /* Голубой цвет при наведении */
 }
+
 .chat-input-wrapper {
     position: sticky ;
     bottom: 0 ;
     padding: 10px ;
     background-color: rgb(105, 162, 212);
 }
+
 /* Добавлены ключевые кадры для анимации */
 @keyframes fadeInOut {
 
@@ -471,7 +497,7 @@ main {
 }
 
 #notification-container {
-    font-size: 60px;
+    font-size: 40px;
     text-align: center;
 }
 
@@ -642,7 +668,11 @@ main {
             font-size: 12px;
 
         }
-
+        #notification-container{
+            width: 300px;
+            height: 150px;
+            font-size: 25px;
+        }
     }
 
     @media only screen and (max-width: 407px) {

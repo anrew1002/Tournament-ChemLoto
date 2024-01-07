@@ -67,7 +67,11 @@ document.addEventListener('DOMContentLoaded', e => {
         pauseTimer();
         console.log('поднятие руки дефолт')
         console.log(isStopButtonHidden)
-        if (isStopButtonHidden === false && isAdmin === 'true') {
+        if (timer === 0){
+          console.log(timer)
+        }
+        
+        else if (isStopButtonHidden === false && isAdmin === 'true') {
           var startButton = document.getElementById('continueButton');
           startButton.style.display = 'block';
           var stopButton = document.getElementById('stopButton');
@@ -76,8 +80,6 @@ document.addEventListener('DOMContentLoaded', e => {
         }
         break;
       case 'raise_hand_admin':
-        console.log('админ поднял ')
-        console.log(isStopButtonHidden)
         raiseHandAdminNotification(data.struct.sender)
         pauseTimer();
 
@@ -102,6 +104,10 @@ document.addEventListener('DOMContentLoaded', e => {
         if (isAdmin === 'false') {
           var button = document.querySelector('.raise-hand-btn');
           button.style.display = 'block';
+        }
+        if (document.getElementById('continueButton').style.display != 'none'){
+          console.log('DDDDDDDdd')
+          document.getElementById('continueButton').style.display = 'none'
         }
         startGameHandler();
         resumeTimer()
@@ -133,12 +139,19 @@ document.addEventListener('DOMContentLoaded', e => {
             timerHandler(data.struct.Time);
           }
           if (data.struct.Paused === true) {
+            
             if (isAdmin === 'true') {
-              var startButton = document.getElementById('continueButton');
+              if (data.struct.Time === 0 ){
+
+              }
+              else {
+                var startButton = document.getElementById('continueButton');
               startButton.style.display = 'block';
 
               var stopButton = document.getElementById('stopButton');
               stopButton.style.display = 'none';
+              }
+              
             }
 
             pauseTimer()
@@ -337,8 +350,14 @@ document.addEventListener('DOMContentLoaded', e => {
     // Устанавливаем текст уведомления с именем пользователя
     notificationText.textContent = `Администратор ${username} Приостанавливает игру!`;
 
+    var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    console.log(screenWidth)
     // Применяем стиль к тексту уведомления (изменение размера шрифта)
-    notificationText.style.fontSize = '40px';
+    if (screenWidth <= 600) {
+      notificationText.style.fontSize = '25px';
+    } else {
+      notificationText.style.fontSize = '40px';
+    }
 
     // Показываем уведомление
     notificationContainer.classList.add('show');
