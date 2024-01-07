@@ -76,8 +76,6 @@ document.addEventListener('DOMContentLoaded', e => {
         }
         break;
       case 'raise_hand_admin':
-        console.log('админ поднял ')
-        console.log(isStopButtonHidden)
         raiseHandAdminNotification(data.struct.sender)
         pauseTimer();
 
@@ -337,8 +335,14 @@ document.addEventListener('DOMContentLoaded', e => {
     // Устанавливаем текст уведомления с именем пользователя
     notificationText.textContent = `Администратор ${username} Приостанавливает игру!`;
 
+    var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    console.log(screenWidth)
     // Применяем стиль к тексту уведомления (изменение размера шрифта)
-    notificationText.style.fontSize = '40px';
+    if (screenWidth <= 600) {
+      notificationText.style.fontSize = '25px';
+    } else {
+      notificationText.style.fontSize = '40px';
+    }
 
     // Показываем уведомление
     notificationContainer.classList.add('show');

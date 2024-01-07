@@ -5,15 +5,25 @@
 <head>
     <link rel="stylesheet" href="../static/styles/room_list.css">
 </head>
-
+<style>
+    @font-face {
+	font-family: 'Rubik'; 
+	src: local('Rubik'),
+		url('../static/fonts/Rubick/Rubik-Regular.ttf'); 
+}
+@font-face {
+	font-family: 'Rubik'; 
+	src: local('Rubik Bold'),
+		url('../static/fonts/Rubick/Rubik-Bold.ttf'); 
+	font-weight: bold;
+}
+</style>
 <body>
 
     <div id="header">
         {{.Username}}
         {{if .Admin}}
-        <form method="post" action="logout.php" style="display: inline;">
-            <button type="submit" name="logout" style="background-color: red; color: white;">Выход</button>
-        </form>
+        
         <form method="GET" action="/admin" style="display: inline;">
             <button type="submit" name="admin_panel">Админ-панель</button>
         </form>
