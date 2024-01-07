@@ -21,17 +21,18 @@
 <body>
 
     <div id="header">
+
         {{.Username}}
         {{if .Admin}}
-        
+        {{if .Admin}}
+        <button id= "if_admin"onclick="showCreateRoomForm()">Создать комнату</button>
+        {{end}}
         <form method="GET" action="/admin" style="display: inline;">
-            <button type="submit" name="admin_panel">Админ-панель</button>
+            <button id="admin_panel_button" type="submit" name="admin_panel">Админ-панель</button>
         </form>
         {{end}}
     </div>
-    {{if .Admin}}
-    <button id= "if_admin"onclick="showCreateRoomForm()">Создать комнату</button>
-    {{end}}
+    
     <!-- Модальное окно для создания комнаты -->
     <div id="createRoomModal" class="modal">
         <div class="modal-content">

@@ -66,7 +66,7 @@ header {
     text-align: left;
     margin: 0;
     /* Убираем отступы */
-    flex-grow: 1;
+
     /* Занимает доступное пространство */
     padding-left: 60px;
 }
@@ -339,17 +339,31 @@ main {
     transition: background-color 0.3s;
     margin-top: 10px;
 }
+.btn {
+    background-color: #4682B4;
+    color: #fff;
+    height: 35px;
+    border-radius: 5px;
+    border: 1px solid #343434;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Плавный переход цвета фона */
+}
 
-.raise-hand-btn,.admin-btn:hover {
+.btn:hover {
+    background-color: #1E90FF; /* Новый цвет фона при наведении */
+}
+.raise-hand-btn:hover ,.admin-btn:hover,.btn:hover {
     background-color: #1E90FF;
     /* Голубой цвет при наведении */
 }
+
 .chat-input-wrapper {
     position: sticky ;
     bottom: 0 ;
     padding: 10px ;
     background-color: rgb(105, 162, 212);
 }
+
 /* Добавлены ключевые кадры для анимации */
 @keyframes fadeInOut {
 
