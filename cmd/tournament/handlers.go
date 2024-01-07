@@ -14,6 +14,7 @@ import (
 	"github.com/anrew1002/Tournament-ChemLoto/models"
 	"github.com/anrew1002/Tournament-ChemLoto/sqlite"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 )
@@ -75,9 +76,20 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 		}
 		log.Printf("%+v", data)
 		err = app.validate.Struct(data)
-		// validationErrors := err.(validator.ValidationErrors)
+		errorsList := make([]string, 2)
 		if err != nil {
-			app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": []string{err.Error()}, "success": false}, nil)
+			validationErrors := err.(validator.ValidationErrors)
+			log.Printf("%+v", validationErrors)
+			for _, v := range validationErrors {
+				if v.Field() == "Name" {
+					errorsList = append(errorsList, "Имя комнаты указано не правильно")
+				} else if v.Field() == "Max_partic" {
+					errorsList = append(errorsList, "Количество игроков указано не правильно")
+				} else {
+					errorsList = append(errorsList, v.Error())
+				}
+			}
+			app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": errorsList, "success": false}, nil)
 			return
 		}
 
