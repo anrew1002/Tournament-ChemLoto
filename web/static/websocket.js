@@ -67,7 +67,11 @@ document.addEventListener('DOMContentLoaded', e => {
         pauseTimer();
         console.log('поднятие руки дефолт')
         console.log(isStopButtonHidden)
-        if (isStopButtonHidden === false && isAdmin === 'true') {
+        if (timer === 0){
+          console.log(timer)
+        }
+        
+        else if (isStopButtonHidden === false && isAdmin === 'true') {
           var startButton = document.getElementById('continueButton');
           startButton.style.display = 'block';
           var stopButton = document.getElementById('stopButton');
@@ -131,12 +135,19 @@ document.addEventListener('DOMContentLoaded', e => {
             timerHandler(data.struct.Time);
           }
           if (data.struct.Paused === true) {
+            
             if (isAdmin === 'true') {
-              var startButton = document.getElementById('continueButton');
+              if (data.struct.Time === 0 ){
+
+              }
+              else {
+                var startButton = document.getElementById('continueButton');
               startButton.style.display = 'block';
 
               var stopButton = document.getElementById('stopButton');
               stopButton.style.display = 'none';
+              }
+              
             }
 
             pauseTimer()
