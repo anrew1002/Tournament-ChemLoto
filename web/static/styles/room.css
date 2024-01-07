@@ -339,6 +339,9 @@ main {
     transition: background-color 0.3s;
     margin-top: 10px;
 }
+.place_message{
+    font-family: 'Rubik', Arial, Helvetica, sans-serif;
+}
 .btn {
     background-color: #4682B4;
     color: #fff;
@@ -347,8 +350,11 @@ main {
     border: 1px solid #343434;
     cursor: pointer;
     transition: background-color 0.3s; /* Плавный переход цвета фона */
+    font-family: 'Rubik', Arial, Helvetica, sans-serif;
 }
-
+button{
+    font-family: 'Rubik', Arial, Helvetica, sans-serif;
+}
 .btn:hover {
     background-color: #1E90FF; /* Новый цвет фона при наведении */
 }
