@@ -29,13 +29,14 @@ func (app *App) HubHandler() http.HandlerFunc {
 		if !ok {
 			log.Println("Fail to type assertion")
 		}
-		log.Println("admin", admin)
+		// log.Println("admin", admin)
 
 		data := struct {
 			Username      string
 			Admin         bool
 			ErrMaxPlayers string
 			ErrRoomName   string
+			Error         string
 		}{
 			Username:      username,
 			Admin:         admin,
@@ -117,7 +118,6 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 			return
 		}
 		app.clientManager.addRoom(*data)
-		// http.Redirect(w, r, "/room_list", http.StatusSeeOther)
 		app.writeJSON(w, http.StatusCreated, envelope{"errors": nil, "success": true}, nil)
 	}
 }
@@ -138,16 +138,30 @@ func (app *App) RoomHandler() http.HandlerFunc {
 					log.Println("Fail to type assertion")
 				}
 				log.Println("admin", admin)
-				app.database.UpdateUserRoom(username, room.Name)
+				roomusers := app.database.GetUsers()
+				count := 0
+				for _, v := range roomusers {
+					if !v.Admin && v.Room == roomID {
+						count += 1
+					}
+				}
 				data := struct {
 					Room     string
 					Username string
 					Admin    bool
+					Error    string
 				}{
 					Room:     roomID,
 					Username: username,
 					Admin:    admin,
 				}
+				if count >= room.Max_partic && !admin {
+					data.Error = "В комнате больше нет мест"
+					app.render(w, http.StatusTemporaryRedirect, "room_list", data)
+					return
+				}
+				app.database.UpdateUserRoom(username, room.Name)
+
 				app.render(w, http.StatusOK, "room", data)
 			} else {
 				w.WriteHeader(404)
@@ -263,7 +277,7 @@ func (app *App) PostAdminLoginHandler(AdminCode string) http.HandlerFunc {
 		if code == AdminCode {
 			data.Admin = true
 		}
-		log.Print(data)
+		// log.Print(data)
 		app.database.AddUser(data)
 		err := SetCookie(w, r, data, app)
 		if err != nil {
@@ -298,7 +312,7 @@ func (app *App) PostLoginHandler() http.HandlerFunc {
 
 		seed := strconv.Itoa(rand.Intn(1000))
 		data.Username = r.FormValue("name") + "#" + seed
-		log.Print(data)
+		// log.Print(data)
 		app.database.AddUser(data)
 		err := SetCookie(w, r, data, app)
 		if err != nil {

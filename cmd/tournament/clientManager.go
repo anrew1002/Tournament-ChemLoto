@@ -23,6 +23,7 @@ type Room struct {
 	ticker         *time.Ticker
 	started        bool
 	paused         bool
+	completed      bool
 	pushedElements []string
 }
 
@@ -134,7 +135,7 @@ func sendRandomItem(room *Room) {
 	elem, ok := room.getRandomElement()
 	if !ok {
 		elem = "Empty bag!"
-
+		room.completed = true
 	}
 	var lastElements []string
 	if len(room.pushedElements) < 5 {

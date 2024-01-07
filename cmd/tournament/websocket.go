@@ -37,6 +37,7 @@ type initConn struct {
 	Time         int
 	Started      bool
 	Paused       bool
+	Completed    bool
 	LastElements []string `json:"last_elements"`
 }
 
@@ -110,7 +111,7 @@ func (app *App) MessagingHandler() http.HandlerFunc {
 		} else {
 			lastElements = room.pushedElements[len(room.pushedElements)-5:]
 		}
-		json_struct, err := json.Marshal(initConn{Time: room.Time, Started: room.started, Paused: room.paused, LastElements: lastElements})
+		json_struct, err := json.Marshal(initConn{Time: room.Time, Started: room.started, Paused: room.paused, Completed: room.completed, LastElements: lastElements})
 		if err != nil {
 			log.Print("failed Marshaled")
 		}
