@@ -237,13 +237,13 @@ func (clnt *wsclient) readerBuffer(app *App) {
 			}
 		case "get_element":
 			room := app.clientManager.rooms[clnt.room]
-			if room.paused {
-				for k, v := range round {
-					if round_int[k] > 0 {
-						round_int[k] -= 1 * boolToInt(v)
-					}
+			// if room.paused {
+			for k, v := range round {
+				if round_int[k] > 0 {
+					round_int[k] -= 1 * boolToInt(v)
 				}
 			}
+			// }
 			room.paused = false
 			sendRandomItem(app.clientManager.rooms[clnt.room])
 
