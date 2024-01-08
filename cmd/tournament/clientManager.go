@@ -25,6 +25,8 @@ type Room struct {
 	paused         bool
 	completed      bool
 	pushedElements []string
+	round          map[string]bool
+	round_int      map[string]int
 }
 
 func newClientManager(store sqlite.Storage) *clientManager {
@@ -62,7 +64,20 @@ func (clntMngr *clientManager) addRoom(room models.Room) {
 	clntMngr.Lock()
 	defer clntMngr.Unlock()
 
-	clntMngr.rooms[room.Name] = &Room{wsconnections: make(map[string]*wsclient), Room: room, pushedElements: make([]string, 0, 264)}
+	clntMngr.rooms[room.Name] = &Room{
+		wsconnections: make(map[string]*wsclient),
+		Room:          room, pushedElements: make([]string, 0, 264),
+		round: map[string]bool{
+			"A": false,
+			"B": false,
+			"Y": false,
+		},
+		round_int: map[string]int{
+			"A": 4,
+			"B": 4,
+			"Y": 4,
+		},
+	}
 }
 
 func (clntMngr *clientManager) removeRoom(room string) {
@@ -131,6 +146,13 @@ func sendRandomItem(room *Room) {
 	// var lastElements = make([]string, 5)
 	// copy(lastElements, room.pushedElements[:5])
 	// log.Println(lastElements)
+
+	for k, v := range room.round {
+		room.round[k] = false
+		if room.round_int[k] > 0 {
+			room.round_int[k] -= 1 * boolToInt(v)
+		}
+	}
 
 	elem, ok := room.getRandomElement()
 	if !ok {

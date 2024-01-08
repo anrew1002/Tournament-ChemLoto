@@ -124,16 +124,17 @@ func (clnt *wsclient) readerBuffer(app *App) {
 	defer func() {
 		clnt.manager.removeClient(clnt, clnt.room)
 	}()
-	round := map[string]bool{
-		"A": false,
-		"B": false,
-		"Y": false,
-	}
-	round_int := map[string]int{
-		"A": 4,
-		"B": 4,
-		"Y": 4,
-	}
+	room := app.clientManager.rooms[clnt.room]
+	// app.clientManager.rooms[clnt.room].round := map[string]bool{
+	// 	"A": false,
+	// 	"B": false,
+	// 	"Y": false,
+	// }
+	// app.clientManager.rooms[clnt.room].round_int := map[string]int{
+	// 	"A": 4,
+	// 	"B": 4,
+	// 	"Y": 4,
+	// }
 	for {
 		_, p, err := clnt.ws.ReadMessage()
 		if err != nil {
@@ -161,7 +162,7 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				log.Print("failed to Marshal")
 			}
 			log.Println(json_struct)
-			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
+			for _, ws := range room.wsconnections {
 				ws.channel <- &wsmessage{Type: "chat_text", Struct: json_struct}
 			}
 
@@ -175,22 +176,22 @@ func (clnt *wsclient) readerBuffer(app *App) {
 					log.Println("score_up: error Unmarshal", err)
 					continue
 				}
-				log.Println(wsmsg_struct)
+				// log.Println(wsmsg_struct)
 				switch wsmsg_struct.Field {
 				case "alpha":
 					if wsmsg_struct.Score == 1 {
-						round["A"] = true
-						score_up = round_int["A"]
+						room.round["A"] = true
+						score_up = room.round_int["A"]
 					}
 				case "beta":
-					round["B"] = true
+					room.round["B"] = true
 					if wsmsg_struct.Score == 1 {
-						score_up = round_int["B"]
+						score_up = room.round_int["B"]
 					}
 				case "gamma":
-					round["Y"] = true
+					room.round["Y"] = true
 					if wsmsg_struct.Score == 1 {
-						score_up = round_int["Y"]
+						score_up = room.round_int["Y"]
 					}
 				case "penalty":
 					if wsmsg_struct.Score == -1 {
@@ -205,11 +206,11 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				if err != nil {
 					log.Println("user score update:", err)
 				}
-				log.Println("successfuly update user score ", score_up)
+				// log.Println("successfuly update user score ", score_up)
 			}
 		case "raise_hand":
-			app.clientManager.rooms[clnt.room].paused = true
-			app.clientManager.rooms[clnt.room].stopTicker()
+			room.paused = true
+			room.stopTicker()
 
 			log.Printf("Game %s stopped", clnt.room)
 			msg := handMessage{Sender: clnt.name}
@@ -218,12 +219,12 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				log.Print("failed Marshaled")
 			}
 			// log.Println(json_struct)
-			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
+			for _, ws := range room.wsconnections {
 				ws.channel <- &wsmessage{Type: "raise_hand", Struct: json_struct}
 			}
 		case "raise_hand_admin":
-			app.clientManager.rooms[clnt.room].paused = true
-			app.clientManager.rooms[clnt.room].stopTicker()
+			room.paused = true
+			room.stopTicker()
 
 			log.Printf("Game %s stopped by admin", clnt.room)
 			msg := handMessage{Sender: clnt.name}
@@ -232,31 +233,16 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				log.Print("failed Marshaled")
 			}
 			// log.Println(json_struct)
-			for _, ws := range app.clientManager.rooms[clnt.room].wsconnections {
+			for _, ws := range room.wsconnections {
 				ws.channel <- &wsmessage{Type: "raise_hand_admin", Struct: json_struct}
 			}
 		case "get_element":
-			room := app.clientManager.rooms[clnt.room]
-			// if room.paused {
-			for k, v := range round {
-				if round_int[k] > 0 {
-					round_int[k] -= 1 * boolToInt(v)
-				}
-			}
-			// }
+
 			room.paused = false
-			sendRandomItem(app.clientManager.rooms[clnt.room])
+			sendRandomItem(room)
 
 		case "start_game":
 			if clnt.admin {
-				room := app.clientManager.rooms[clnt.room]
-				if room.paused {
-					for k, v := range round {
-						if round_int[k] > 0 {
-							round_int[k] -= 1 * boolToInt(v)
-						}
-					}
-				}
 				room.paused = false
 				if room.Time != 0 {
 					go room.startTicker()
@@ -271,9 +257,9 @@ func (clnt *wsclient) readerBuffer(app *App) {
 					ws.channel <- &wsmessage{Type: "start_game", Struct: json_struct}
 				}
 				// fmt.Println(room.Elements)
-				if !room.started {
+				if !room.started && room.Time == 0 {
 					room.started = true
-					sendRandomItem(app.clientManager.rooms[clnt.room])
+					sendRandomItem(room)
 				}
 			}
 		default:
@@ -303,6 +289,7 @@ func (clnt *wsclient) writeBuffer() {
 			}
 			if err := clnt.ws.WriteJSON(msg); err != nil {
 				log.Println("Failed send message", err)
+				return
 			}
 		}
 	}
