@@ -84,7 +84,7 @@ func (room *Room) getRandomElement() (string, bool) {
 	// i := 0
 	for k, v := range elems {
 		if v != 0 {
-			log.Println(k, " ", v, " ")
+			// log.Println(k, " ", v, " ")
 			keys = append(keys, k)
 			// i++
 		}
@@ -120,7 +120,7 @@ func (room *Room) getRandomElement() (string, bool) {
 
 func (room *Room) startTicker() {
 	room.ticker = time.NewTicker(time.Duration(room.Time) * time.Second)
-	log.Println("Ticker set!")
+	// log.Println("Ticker set!")
 	// room.ticker.Reset(time.Duration(room.Time) * time.Second)
 	sendRandomItem(room)
 	for range room.ticker.C {
@@ -147,7 +147,7 @@ func sendRandomItem(room *Room) {
 	if err != nil {
 		log.Print("failed Marshaled")
 	}
-	log.Println(elem)
+	// log.Println(elem)
 	for _, ws := range room.wsconnections {
 		ws.channel <- &wsmessage{Type: "send_element", Struct: json_struct}
 	}

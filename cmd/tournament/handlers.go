@@ -74,12 +74,12 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 			app.writeJSON(w, http.StatusUnprocessableEntity, envelope{"errors": []string{"Fail to decode JSON"}, "success": false}, nil)
 			return
 		}
-		log.Printf("%+v", data)
+		// log.Printf("%+v", data)
 		err = app.validate.Struct(data)
 		errorsList := make([]string, 2)
 		if err != nil {
 			validationErrors := err.(validator.ValidationErrors)
-			log.Printf("%+v", validationErrors)
+			// log.Printf("%+v", validationErrors)
 			for _, v := range validationErrors {
 				if v.Field() == "Name" {
 					errorsList = append(errorsList, "Имя комнаты указано не правильно")
@@ -114,7 +114,7 @@ func (app *App) CreateRoomHandler() http.HandlerFunc {
 		// 	"TRADE": 4,
 		// 	// "C6H4": 16,
 		// }
-		log.Println(data)
+		// log.Println(data)
 		err = app.database.CreateRoom(*data)
 		// fmt.Printf("err: %T\n", err)
 		// log.Print(err)
@@ -149,7 +149,7 @@ func (app *App) RoomHandler() http.HandlerFunc {
 				if !ok {
 					log.Println("Fail to type assertion")
 				}
-				log.Println("admin", admin)
+				// log.Println("admin", admin)
 				roomusers := app.database.GetUsers()
 				count := 0
 				for _, v := range roomusers {

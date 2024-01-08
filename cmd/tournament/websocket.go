@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -262,10 +261,8 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				if room.Time != 0 {
 					go room.startTicker()
 				}
-				if !room.started {
-					room.started = true
-				}
-				log.Printf("Game %s start!", room.Name)
+
+				log.Printf("Game %s start! ", room.Name)
 				json_struct, err := json.Marshal(startGame{Time: room.Time})
 				if err != nil {
 					log.Print("failed Marshaled")
@@ -273,7 +270,11 @@ func (clnt *wsclient) readerBuffer(app *App) {
 				for _, ws := range room.wsconnections {
 					ws.channel <- &wsmessage{Type: "start_game", Struct: json_struct}
 				}
-				fmt.Println(room.Elements)
+				// fmt.Println(room.Elements)
+				if !room.started {
+					room.started = true
+					sendRandomItem(app.clientManager.rooms[clnt.room])
+				}
 			}
 		default:
 			log.Println("websocket get undefined message type: ", wsmsg.Type)
